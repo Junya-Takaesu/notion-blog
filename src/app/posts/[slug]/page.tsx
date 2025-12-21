@@ -4,7 +4,7 @@ import { BlogSidebar } from "@/components/blog/blog-sidebar"
 import { BlogNavigation } from "@/components/blog/blog-navigation"
 import { MobileMenu } from "@/components/blog/mobile-menu"
 import { BlogSidebarContent } from "@/components/blog/blog-sidebar-content"
-import { getBlogPostBySlug, getBlogTags } from "@/actions/notion-client"
+import { getBlogPostBySlug, getBlogTags, getBlogPosts } from "@/actions/notion-client"
 import { extractHeadingsFromHtml } from "@/lib/extract-headings"
 import { notFound } from "next/navigation"
 
@@ -27,29 +27,13 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   // Fetch real tags with counts from Notion
   const tags = await getBlogTags()
 
-  // TODO: Fetch recent posts from Notion
-  const recentPosts = [
-    {
-      title: "動かして理解する。AI駆動型マルウェアとは",
-      date: "2025-12-18",
-      href: "#",
-    },
-    {
-      title: "Google Cloud資格全冠達成のリアル！",
-      date: "2025-12-17",
-      href: "#",
-    },
-    {
-      title: "ハッカソンでIoT腹巻きを作ったら、競馬の冠レースを開催していた話",
-      date: "2025-12-16",
-      href: "#",
-    },
-    {
-      title: "LLMに易しいOpenStack MCPサーバーの作り方",
-      date: "2025-12-14",
-      href: "#",
-    },
-  ]
+  // Fetch recent posts from Notion (limit to 4 posts)
+  const allPosts = await getBlogPosts()
+  const recentPosts = allPosts.slice(0, 4).map(post => ({
+    title: post.title,
+    date: post.date,
+    href: post.href,
+  }))
 
 
 

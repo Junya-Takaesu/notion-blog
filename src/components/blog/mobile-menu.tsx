@@ -23,11 +23,6 @@ interface TocItem {
   level: number
 }
 
-interface MobileMenuProps {
-  tocItems?: TocItem[]
-  tags?: Tag[]
-}
-
 export function MobileMenu({ tocItems, tags }: { tocItems: TocItem[], tags: Tag[] }) {
   const [open, setOpen] = useState(false)
 

@@ -10,28 +10,12 @@ export default async function BlogListPage() {
   const blogPosts = await getBlogPosts()
   const tags = await getBlogTags()
 
-  const recentPosts = [
-    {
-      title: "動かして理解する。AI駆動型マルウェアとは",
-      date: "2025-12-18",
-      href: "/",
-    },
-    {
-      title: "Google Cloud資格全冠達成のリアル！",
-      date: "2025-12-17",
-      href: "/",
-    },
-    {
-      title: "ハッカソンでIoT腹巻きを作ったら、競馬の冠レースを開催していた話",
-      date: "2025-12-16",
-      href: "/",
-    },
-    {
-      title: "LLMに易しいOpenStack MCPサーバーの作り方",
-      date: "2025-12-14",
-      href: "/",
-    },
-  ]
+  // Fetch recent posts from Notion (limit to 4 posts)
+  const recentPosts = blogPosts.slice(0, 4).map(post => ({
+    title: post.title,
+    date: post.date,
+    href: post.href,
+  }))
 
   return (
     <div className="min-h-screen bg-background">
