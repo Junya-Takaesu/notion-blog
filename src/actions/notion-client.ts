@@ -294,6 +294,28 @@ function convertBlockToHtml(block: any, getHeadingId: () => number): string {
             const text = block.quote?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
             return `<blockquote>${text}</blockquote>`;
         }
+        case 'image': {
+            // Handle both external and file (Notion-hosted) images
+            const imageData = block.image;
+            let imageUrl = '';
+            let altText = '';
+
+            if (imageData?.type === 'external') {
+                imageUrl = imageData.external?.url || '';
+            } else if (imageData?.type === 'file') {
+                imageUrl = imageData.file?.url || '';
+            }
+
+            // Extract caption as alt text
+            const caption = imageData?.caption?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
+            altText = caption || 'Image';
+
+            if (!imageUrl) {
+                return '';
+            }
+
+            return `<figure class="my-4"><img src="${imageUrl}" alt="${altText}" class="w-full rounded-lg" />${caption ? `<figcaption class="text-sm text-muted-foreground mt-2 text-center">${caption}</figcaption>` : ''}</figure>`;
+        }
         default:
             return '';
     }
