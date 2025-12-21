@@ -66,22 +66,19 @@ export function BlogSidebarContent({
             <CardTitle className="text-lg">タグ</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2">
+            <div className="flex flex-wrap gap-2">
               {tags.map((tag, index) => (
-                <li key={index}>
-                  <a
-                    href="#"
-                    className="flex items-center justify-between text-sm hover:text-primary transition-colors"
-                    onClick={onLinkClick}
-                  >
-                    <span>{tag.name}</span>
-                    <Badge variant="outline" className="ml-2">
-                      {tag.count}
-                    </Badge>
-                  </a>
-                </li>
+                <a
+                  key={index}
+                  href="#"
+                  onClick={onLinkClick}
+                >
+                  <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors">
+                    {tag.name} {tag.count}
+                  </Badge>
+                </a>
               ))}
-            </ul>
+            </div>
           </CardContent>
         </Card>
       )}
