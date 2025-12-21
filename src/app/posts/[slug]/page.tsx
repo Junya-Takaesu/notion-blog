@@ -1,9 +1,9 @@
 import { BlogHeader } from "@/components/blog/blog-header"
-import { TableOfContents } from "@/components/blog/table-of-contents"
 import { BlogContent } from "@/components/blog/blog-content"
 import { BlogSidebar } from "@/components/blog/blog-sidebar"
 import { BlogNavigation } from "@/components/blog/blog-navigation"
-import { getBlogPostBySlug } from "@/actions/notion-client"
+import { getBlogPostBySlug, getBlogTags } from "@/actions/notion-client"
+import { extractHeadingsFromHtml } from "@/lib/extract-headings"
 import { notFound } from "next/navigation"
 
 // Force dynamic rendering for this page
@@ -18,31 +18,12 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   if (!post) {
     notFound()
   }
-  // TODO: Extract table of contents from Notion content
-  const tocItems = [
-    { id: "section-1", title: "ひとよひとよに管理職(マネージャー)…", level: 2 },
-    { id: "section-2", title: "ふたやく以上での立ち回り…!?", level: 2 },
-    { id: "section-3", title: "みつめられてもなんにも出ないですよ…? (1on1の話題)", level: 2 },
-    { id: "section-4", title: "ウェルカムトゥ影(ダーク)サイト", level: 2 },
-    { id: "section-5", title: "超絶進化のマネージャー生活この手につかむ!", level: 2 },
-    { id: "section-5-1", title: "1. チームのふりかえりで出た良し悪しを自身の良し悪しへ転換する", level: 3 },
-    {
-      id: "section-5-2",
-      title: "2. 自身がしっくりくるエンジニアリングマネージャーの型にそっくりハマるよう動いてみる",
-      level: 3,
-    },
-    { id: "section-6", title: "それ目指して歩き出してきたんです確か…", level: 2 },
-  ]
 
-  // TODO: Fetch tags with counts from Notion
-  const tags = [
-    { name: "テクノロジー", count: 333 },
-    { name: "事例紹介", count: 69 },
-    { name: "セキュリティ", count: 86 },
-    { name: "アドベントカレンダー", count: 91 },
-    { name: "クラウドコンピューティング", count: 65 },
-    { name: "プログラミング", count: 63 },
-  ]
+  // Extract table of contents from HTML content dynamically
+  const tocItems = extractHeadingsFromHtml(post.content)
+
+  // Fetch real tags with counts from Notion
+  const tags = await getBlogTags()
 
   // TODO: Fetch recent posts from Notion
   const recentPosts = [
@@ -81,8 +62,6 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
           <main>
-            <TableOfContents items={tocItems} />
-
             <BlogContent>
               <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </BlogContent>
@@ -99,7 +78,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             />
           </main>
 
-          <BlogSidebar tags={tags} recentPosts={recentPosts} />
+          <BlogSidebar tocItems={tocItems} tags={tags} recentPosts={recentPosts} />
         </div>
       </div>
     </div>

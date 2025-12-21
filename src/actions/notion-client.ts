@@ -231,9 +231,13 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPostDetail | 
             block_id: page.id,
         });
 
-        // Convert blocks to HTML-like content
+        // Convert blocks to HTML-like content with heading IDs
+        let headingCounter = 0;
         const content = blocks.results.map((block) => {
-            return convertBlockToHtml(block);
+            return convertBlockToHtml(block, () => {
+                headingCounter++;
+                return headingCounter;
+            });
         }).join('\n');
 
         return {
@@ -251,7 +255,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPostDetail | 
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function convertBlockToHtml(block: any): string {
+function convertBlockToHtml(block: any, getHeadingId: () => number): string {
     const type = block.type;
 
     switch (type) {
@@ -261,15 +265,18 @@ function convertBlockToHtml(block: any): string {
         }
         case 'heading_1': {
             const text = block.heading_1?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
-            return `<h1>${text}</h1>`;
+            const id = `heading-${getHeadingId()}`;
+            return `<h1 id="${id}">${text}</h1>`;
         }
         case 'heading_2': {
             const text = block.heading_2?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
-            return `<h2>${text}</h2>`;
+            const id = `heading-${getHeadingId()}`;
+            return `<h2 id="${id}">${text}</h2>`;
         }
         case 'heading_3': {
             const text = block.heading_3?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
-            return `<h3>${text}</h3>`;
+            const id = `heading-${getHeadingId()}`;
+            return `<h3 id="${id}">${text}</h3>`;
         }
         case 'bulleted_list_item': {
             const text = block.bulleted_list_item?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';

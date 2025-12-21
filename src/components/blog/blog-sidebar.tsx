@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { List } from "lucide-react"
 
 interface Tag {
   name: string
@@ -12,14 +13,43 @@ interface RecentPost {
   href: string
 }
 
+interface TocItem {
+  id: string
+  title: string
+  level: number
+}
+
 interface BlogSidebarProps {
+  tocItems?: TocItem[]
   tags?: Tag[]
   recentPosts?: RecentPost[]
 }
 
-export function BlogSidebar({ tags = [], recentPosts = [] }: BlogSidebarProps) {
+export function BlogSidebar({ tocItems = [], tags = [], recentPosts = [] }: BlogSidebarProps) {
   return (
     <aside className="space-y-6">
+      {tocItems.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <List className="h-5 w-5" />
+              <span>目次</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {tocItems.map((item) => (
+                <li key={item.id} style={{ paddingLeft: `${(item.level - 1) * 0.75}rem` }}>
+                  <a href={`#${item.id}`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {item.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
       {tags.length > 0 && (
         <Card>
           <CardHeader>
