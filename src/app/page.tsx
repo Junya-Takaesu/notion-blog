@@ -1,5 +1,6 @@
 import { BlogPostCard } from "@/components/blog/blog-post-card"
 import { BlogSidebar } from "@/components/blog/blog-sidebar"
+import { MobileMenu } from "@/components/blog/mobile-menu"
 import { getBlogPosts, getBlogTags } from "@/actions/notion-client"
 
 // Force dynamic rendering for this page
@@ -54,6 +55,8 @@ export default async function BlogListPage() {
           </aside>
         </div>
       </div>
+      {/* Mobile hamburger menu with TOC and tags */}
+      <MobileMenu tocItems={[]} tags={tags} />
     </div>
   )
 }
