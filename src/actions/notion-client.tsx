@@ -1,11 +1,21 @@
 import { Client } from "@notionhq/client";
 
-// Initializing a client
-const notion = new Client({
-    auth: process.env.NOTION_TOKEN,
-});
+// Type-safe environment variable validation
+function validateEnvVar(value: string | undefined, name: string): string {
+    if (!value || value.trim() === '') {
+        throw new Error(`${name} is required but not defined in environment variables`);
+    }
+    return value;
+}
 
-const datasourceId = process.env.NOTION_DATASOURCE_ID || '';
+// Validate required environment variables
+const notionToken = validateEnvVar(process.env.NOTION_TOKEN, 'NOTION_TOKEN');
+const datasourceId = validateEnvVar(process.env.NOTION_DATASOURCE_ID, 'NOTION_DATASOURCE_ID');
+
+// Initialize client only after validation
+const notion = new Client({
+    auth: notionToken,
+});
 
 // For debugging purposes only
 export async function searchNotion() {
