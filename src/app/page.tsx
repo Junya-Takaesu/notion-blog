@@ -1,21 +1,13 @@
 import { BlogPostCard } from "@/components/blog/blog-post-card"
 import { BlogSidebar } from "@/components/blog/blog-sidebar"
-import { getBlogPosts } from "@/actions/notion-client"
+import { getBlogPosts, getBlogTags } from "@/actions/notion-client"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
 
 export default async function BlogListPage() {
   const blogPosts = await getBlogPosts()
-
-  const tags = [
-    { name: "テクノロジー", count: 333 },
-    { name: "事例紹介", count: 69 },
-    { name: "セキュリティ", count: 86 },
-    { name: "アドベントカレンダー", count: 91 },
-    { name: "クラウドコンピューティング", count: 65 },
-    { name: "プログラミング", count: 63 },
-  ]
+  const tags = await getBlogTags()
 
   const recentPosts = [
     {

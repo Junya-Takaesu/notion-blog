@@ -291,3 +291,33 @@ function convertBlockToHtml(block: any): string {
             return '';
     }
 }
+
+export interface TagWithCount {
+    name: string;
+    count: number;
+}
+
+export async function getBlogTags(): Promise<TagWithCount[]> {
+    try {
+        const blogPosts = await getBlogPosts();
+
+        // Count tags from all blog posts
+        const tagCounts = new Map<string, number>();
+
+        blogPosts.forEach((post) => {
+            post.tags.forEach((tag) => {
+                tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+            });
+        });
+
+        // Convert to array and sort by count descending
+        const tags: TagWithCount[] = Array.from(tagCounts.entries())
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count);
+
+        return tags;
+    } catch (error) {
+        console.error('Failed to get blog tags:', error);
+        throw new Error(`Failed to get blog tags: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
