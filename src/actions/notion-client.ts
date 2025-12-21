@@ -119,8 +119,12 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
             const tagsProp = properties.tags || properties.Tags || properties.Category;
             const tags = ((tagsProp as { multi_select?: NotionTag[] })?.multi_select?.map((tag: NotionTag) => tag.name) || []);
 
-            // Generate href from page id
-            const href = `/posts/${page.id}`;
+            // Extract slug
+            const slugProp = properties.slug || properties.Slug;
+            const slug = (slugProp as { rich_text?: Array<{ plain_text?: string }> })?.rich_text?.[0]?.plain_text || page.id;
+
+            // Generate href from slug
+            const href = `/posts/${slug}`;
 
             return {
                 title,
