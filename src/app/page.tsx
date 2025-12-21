@@ -34,14 +34,14 @@ export default async function BlogListPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">記事一覧</h1>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2">記事一覧</h1>
           <hr />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
-          <main>
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          <main className="flex-1 min-w-0">
             <div className="space-y-6">
               {blogPosts.map((post, index) => (
                 <BlogPostCard key={index} {...post} />
@@ -49,7 +49,9 @@ export default async function BlogListPage() {
             </div>
           </main>
 
-          <BlogSidebar tags={tags} recentPosts={recentPosts} />
+          <aside className="w-full lg:w-80 lg:flex-shrink-0">
+            <BlogSidebar tags={tags} recentPosts={recentPosts} />
+          </aside>
         </div>
       </div>
     </div>

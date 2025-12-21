@@ -10,9 +10,9 @@ interface BlogHeaderProps {
 
 export function BlogHeader({ title, date, tags, slug }: BlogHeaderProps) {
   return (
-    <header className="border-b border-border pb-6 mb-8">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-        <Calendar className="h-4 w-4" />
+    <header className="border-b border-border pb-4 sm:pb-6 mb-6 sm:mb-8">
+      <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4 flex-wrap">
+        <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
         <time dateTime={date}>{date}</time>
         {slug && (
           <>
@@ -23,10 +23,10 @@ export function BlogHeader({ title, date, tags, slug }: BlogHeaderProps) {
           </>
         )}
       </div>
-      <h1 className="text-4xl font-bold mb-4 text-balance">{title}</h1>
+      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 text-balance break-words">{title}</h1>
       <div className="flex flex-wrap gap-2">
         {tags.map((tag) => (
-          <Badge key={tag} variant="secondary">
+          <Badge key={tag} variant="secondary" className="text-xs sm:text-sm">
             {tag}
           </Badge>
         ))}

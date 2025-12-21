@@ -15,20 +15,20 @@ export function BlogPostCard({ title, excerpt, date, tags, href }: BlogPostCardP
   return (
     <Card className="group hover:shadow-lg transition-shadow">
       <Link href={href}>
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-            <Calendar className="h-4 w-4" />
+        <CardHeader className="pb-3 sm:pb-4">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3">
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
             <time dateTime={date}>{date}</time>
           </div>
-          <h2 className="text-2xl font-bold group-hover:text-primary transition-colors text-balance leading-snug">
+          <h2 className="text-xl sm:text-2xl font-bold group-hover:text-primary transition-colors text-balance leading-snug break-words">
             {title}
           </h2>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3">{excerpt}</p>
-          <div className="flex flex-wrap gap-2">
+          <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 leading-relaxed line-clamp-3">{excerpt}</p>
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {tags.map((tag) => (
-              <Badge key={tag} variant="secondary">
+              <Badge key={tag} variant="secondary" className="text-xs sm:text-sm">
                 {tag}
               </Badge>
             ))}

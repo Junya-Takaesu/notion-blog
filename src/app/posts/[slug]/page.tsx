@@ -53,15 +53,15 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
         <BlogHeader
           title={post.title}
           date={post.createdTime}
           tags={post.tags}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
-          <main>
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          <main className="flex-1 min-w-0">
             <BlogContent>
               <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </BlogContent>
@@ -78,7 +78,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             />
           </main>
 
-          <BlogSidebar tocItems={tocItems} tags={tags} recentPosts={recentPosts} />
+          <aside className="w-full lg:w-80 lg:flex-shrink-0">
+            <BlogSidebar tocItems={tocItems} tags={tags} recentPosts={recentPosts} />
+          </aside>
         </div>
       </div>
     </div>
