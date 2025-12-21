@@ -1,8 +1,9 @@
-'use server'
-
 import { BlogPostCard } from "@/components/blog/blog-post-card"
 import { BlogSidebar } from "@/components/blog/blog-sidebar"
 import { getBlogPosts } from "@/actions/notion-client"
+
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
 
 export default async function BlogListPage() {
   const blogPosts = await getBlogPosts()

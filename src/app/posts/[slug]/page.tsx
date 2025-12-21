@@ -1,14 +1,24 @@
-'use server'
-
 import { BlogHeader } from "@/components/blog/blog-header"
 import { TableOfContents } from "@/components/blog/table-of-contents"
 import { BlogContent } from "@/components/blog/blog-content"
 import { BlogSidebar } from "@/components/blog/blog-sidebar"
 import { BlogNavigation } from "@/components/blog/blog-navigation"
+import { getBlogPostBySlug } from "@/actions/notion-client"
+import { notFound } from "next/navigation"
+
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  // TODO: Use params.slug to fetch blog post from Notion API
-  await params
+  const { slug } = await params
+
+  // Fetch blog post from Notion API
+  const post = await getBlogPostBySlug(slug)
+
+  if (!post) {
+    notFound()
+  }
+  // TODO: Extract table of contents from Notion content
   const tocItems = [
     { id: "section-1", title: "ひとよひとよに管理職(マネージャー)…", level: 2 },
     { id: "section-2", title: "ふたやく以上での立ち回り…!?", level: 2 },
@@ -24,6 +34,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     { id: "section-6", title: "それ目指して歩き出してきたんです確か…", level: 2 },
   ]
 
+  // TODO: Fetch tags with counts from Notion
   const tags = [
     { name: "テクノロジー", count: 333 },
     { name: "事例紹介", count: 69 },
@@ -33,6 +44,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     { name: "プログラミング", count: 63 },
   ]
 
+  // TODO: Fetch recent posts from Notion
   const recentPosts = [
     {
       title: "動かして理解する。AI駆動型マルウェアとは",
@@ -62,9 +74,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <BlogHeader
-          title="じぶんが管理職になれるわけないじゃん、ムリムリ! (※ムリでもやるんだ!!)"
-          date="2025-12-15"
-          tags={["テクノロジー", "事例紹介", "セキュリティ", "アドベントカレンダー"]}
+          title={post.title}
+          date={post.createdTime}
+          tags={post.tags}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
@@ -72,106 +84,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             <TableOfContents items={tocItems} />
 
             <BlogContent>
-              <p>この記事は、NTT docomo Business Advent Calendar 2025の15日目の記事です。</p>
-
-              <p>
-                皆さまどうもこんにちは、@strinsert1Naという人です。以前は株式会社エヌ・エフ・ラボラトリーズという会社に出向しながらバリバリ「脅威インテリジェンス」のお仕事をしておりまして、今年の7月からはNTTドコモビジネス
-                情報セキュリティ部の管理職として新たなキャリアを歩んでおります。
-              </p>
-
-              <p>
-                この記事では、社会人人生をずっとエンジニア(プレイヤー)としてだけバリューを出し続けてきた筆者が、管理職になって発生した苦悩やモヤモヤ、そしてそれを解決するためにとったアプローチについてまとめたいと思います。
-              </p>
-
-              <h2 id="section-1">ひとよひとよに管理職(マネージャー)…</h2>
-
-              <p>
-                まずは筆者がプレイヤー時代にどんな働き方をしていたかについて、経歴を含めて紹介します。一言でまとめると「子会社出向して技術力とアウトプットの魅せ方に注力を置いていたら、プレイヤーとして高く評価された」といった状況です。
-              </p>
-
-              <ul>
-                <li>
-                  旧NTTコミュニケーションズに入社、新入社員研修を終え1年目で株式会社エヌ・エフ・ラボラトリーズへ出向
-                </li>
-                <li>
-                  そこから約6年間、エンジニアリングチームでセキュリティプロダクトの開発・運用・マルウェア解析、脅威インテリジェンスの生成業務をプレイヤーとしてひたすら頑張る
-                </li>
-                <li>
-                  チームメンバーはマネージャーを除くと20代から30代のみで、技術獲得に対するモチベーションが非常に高い
-                </li>
-              </ul>
-
-              <h2 id="section-2">ふたやく以上での立ち回り…!?</h2>
-
-              <p>
-                このような背景のもと、筆者は親会社のNTTドコモビジネスに戻り晴れてそこで10人チームのマネージャーをすることになりました。
-              </p>
-
-              <p>
-                「さて、これから良いチームを作っていくぞー」と意気込んだところですぐ問題に直面します。
-                <strong>「……あれ、タスクってどうやってメンバーに振っていけばいいんだろう?」</strong>
-              </p>
-
-              <h2 id="section-3">みつめられてもなんにも出ないですよ…? (1on1の話題)</h2>
-
-              <p>
-                最近の管理職研修には1on1の実施そのものが含まれていて、おそらく多くのJTCでは半強制的に導入されていることでしょう。この記事を読んでいる皆さまも、1on1をすでに経験されたことがあるかと思います。
-              </p>
-
-              <p>
-                筆者自身もこれまで何度も上司にセッティングされた1on1に参加し、何1つ苦に感じることなく会話をしてきました。ですが、実はセッティングする側になってみるとなかなか難しいことがわかります。
-              </p>
-
-              <h2 id="section-4">ウェルカムトゥ影(ダーク)サイト</h2>
-
-              <p>
-                このような事象が2〜3ヶ月くらい続いた結果、筆者は俗に言う「インポスター症候群」と呼ばれる状態になりました。直訳すると、自身の上司やメンバーから「この人全然マネージャーの仕事できてないじゃんって思われてるんだろうなぁ…」と考えながら仕事をする状態になったということです。
-              </p>
-
-              <h2 id="section-5">超絶進化のマネージャー生活この手につかむ!</h2>
-
-              <p>
-                それでは、プレイヤーから上がったばかりの筆者は具体的にどう改善していったのか?
-                というのを2点ほど書いていきたいと思います。
-              </p>
-
-              <h3 id="section-5-1">1. チームのふりかえりで出た良し悪しを自身の良し悪しへ転換する</h3>
-
-              <p>
-                1つめは主にメンタル面での改善です。本来は行動の良し悪しを自己で振り返って評価し、改善するのが望ましい姿なのでしょうが、気持ちが落ち込み気味の状態で始めても上向きになるには時間がかかります。
-              </p>
-
-              <p>
-                そこで筆者は、チームに「ふりかえり(レトロスペクティブ)」の概念を導入し、チームメンバーの力を借りながらフィードバックを得る方向性にしてみました。
-              </p>
-
-              <h3 id="section-5-2">
-                2. 自身がしっくりくるエンジニアリングマネージャーの型にそっくりハマるよう動いてみる
-              </h3>
-
-              <p>
-                2つめは行動面での改善です。筆者が受けた管理職研修の多くは「大切な軸はこれ!
-                でもマネジメントに正解はないから、課題出すからみんなで考えてみてね!!
-                (完)」という形式が多く、「何かしら方法論を提示して欲しい、それに沿ってやってみるから」と思ったのが個人の感想になります。
-              </p>
-
-              <p>
-                そこで、一般的にはよくないことと言われそうですが、自身が最もしっくりくる「エンジニアリングマネージャー論」の型を探し、そこにハマるようにして動いてみました。
-              </p>
-
-              <h2 id="section-6">それ目指して歩き出してきたんです確か…</h2>
-
-              <p>
-                新人エンジニアリングマネージャーの悩みを、徒然なるままに書かせていただきました。管理職に求められるロールが年々増えてきて単純に業績を出す以上の負荷がかかっているのは事実かなと思います。
-              </p>
-
-              <p>
-                筆者は社会人2年目で心から尊敬するエンジニアリングマネージャーに出会えたことでエンジニアリングの考え方が変わりました。いいマネージャーとの出会いはその人の成長速度だけでなくエンジニアリングの考え方の根底そのものを変えるほどの強い影響力を持っていると筆者は信じています。
-              </p>
-
-              <p>
-                あまりまとまりのない話でしたが、同じような境遇になっている人、キャリアを目指している人の何かしらの参考になれば嬉しいです。
-              </p>
+              <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </BlogContent>
 
             <BlogNavigation
