@@ -2,6 +2,8 @@ import { BlogHeader } from "@/components/blog/blog-header"
 import { BlogContent } from "@/components/blog/blog-content"
 import { BlogSidebar } from "@/components/blog/blog-sidebar"
 import { BlogNavigation } from "@/components/blog/blog-navigation"
+import { MobileMenu } from "@/components/blog/mobile-menu"
+import { BlogSidebarContent } from "@/components/blog/blog-sidebar-content"
 import { getBlogPostBySlug, getBlogTags } from "@/actions/notion-client"
 import { extractHeadingsFromHtml } from "@/lib/extract-headings"
 import { notFound } from "next/navigation"
@@ -76,12 +78,20 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 href: "#",
               }}
             />
+
+            {/* Recent posts section for mobile - shown after navigation */}
+            <div className="lg:hidden mt-8">
+              <BlogSidebarContent recentPosts={recentPosts} />
+            </div>
           </main>
 
           <aside className="w-full lg:w-80 lg:flex-shrink-0">
             <BlogSidebar tocItems={tocItems} tags={tags} recentPosts={recentPosts} />
           </aside>
         </div>
+
+        {/* Mobile hamburger menu with TOC and tags */}
+        <MobileMenu tocItems={tocItems} tags={tags} />
       </div>
     </div>
   )
