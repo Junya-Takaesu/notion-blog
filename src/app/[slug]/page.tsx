@@ -7,8 +7,8 @@ import { BlogSidebar } from "@/components/blog/blog-sidebar"
 import { BlogNavigation } from "@/components/blog/blog-navigation"
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const { slug } = await params
-  console.log(slug)
+  // TODO: Use params.slug to fetch blog post from Notion API
+  await params
   const tocItems = [
     { id: "section-1", title: "ひとよひとよに管理職(マネージャー)…", level: 2 },
     { id: "section-2", title: "ふたやく以上での立ち回り…!?", level: 2 },
