@@ -1,0 +1,19 @@
+# gitleaks.toml
+
+[[rules]]
+    id = "strict-uuid-check"
+    description = "Standalone UUID detected (including comments)"
+    # UUID形式のみを単純に探す正規表現
+    regex = '''(?i)[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}'''
+    
+    # このキーワードが含まれる行を重点的にスキャン（高速化のため）
+    keywords = ["id", "datasource", "client", "key", "token", "api", "auth", "secret"]
+
+# 特定のファイル（テストデータやロックファイル）を除外したい場合
+[allowlist]
+    paths = [
+        "package-lock.json",
+        "node_modules",
+        "yarn.lock",
+        ".secrets.baseline"
+    ]
