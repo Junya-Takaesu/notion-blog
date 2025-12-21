@@ -75,3 +75,66 @@ export async function queryDatasource() {
         throw new Error(`Failed to query datasource ${datasourceId}: ${error instanceof Error ? error.message : String(error)}`);
     }
 }
+
+export interface BlogPost {
+    title: string;
+    excerpt: string;
+    date: string;
+    tags: string[];
+    href: string;
+}
+
+interface NotionPage {
+    id: string;
+    properties?: Record<string, unknown>;
+    created_time?: string;
+}
+
+interface NotionTag {
+    name: string;
+}
+
+export async function getBlogPosts(): Promise<BlogPost[]> {
+    try {
+        const response = await queryDatasource();
+
+        // Extract blog posts from the response
+        const blogPosts: BlogPost[] = response.results.map((page: NotionPage) => {
+            const properties = page.properties || {};
+
+            // Extract title
+            const titleProp = properties.title || properties.Title || properties.Name;
+            const title = (titleProp as { title?: Array<{ plain_text?: string }> })?.title?.[0]?.plain_text || 'Untitled';
+
+            // Extract excerpt
+            const excerptProp = properties.excerpt || properties.Excerpt || properties.Description;
+            const excerpt = (excerptProp as { rich_text?: Array<{ plain_text?: string }> })?.rich_text?.[0]?.plain_text || '';
+
+            // Extract date
+            const dateProp = properties.date || properties.Date || properties.created_time || page.created_time;
+            const date = typeof dateProp === 'string' ? dateProp : ((dateProp as { date?: { start?: string } })?.date?.start || new Date().toISOString());
+            const formattedDate = new Date(date).toISOString().split('T')[0];
+
+            // Extract tags
+            const tagsProp = properties.tags || properties.Tags || properties.Category;
+            const tags = ((tagsProp as { multi_select?: NotionTag[] })?.multi_select?.map((tag: NotionTag) => tag.name) || []);
+
+            // Generate href from page id
+            const href = `/posts/${page.id}`;
+
+            return {
+                title,
+                excerpt,
+                date: formattedDate,
+                tags,
+                href,
+            };
+        });
+
+        // Sort by date descending
+        return blogPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    } catch (error) {
+        console.error('Failed to get blog posts:', error);
+        throw new Error(`Failed to get blog posts: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
