@@ -28,7 +28,7 @@ interface MobileMenuProps {
   tags?: Tag[]
 }
 
-export function MobileMenu({ tocItems = [], tags = [] }: MobileMenuProps) {
+export function MobileMenu({ tocItems, tags }: { tocItems: TocItem[], tags: Tag[] }) {
   const [open, setOpen] = useState(false)
 
   return (
