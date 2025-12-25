@@ -13,12 +13,15 @@ Next.js 16 blog application that fetches content from Notion API.
 ## Development Workflow
 
 1. **Implementation** - Make code changes following Next.js/TypeScript best practices
-2. **Dev Server** - Run `npm run dev`, monitor logs for errors
-3. **Playwright Testing** - Test UI elements and user interactions
-4. **Visual Verification** - Verify display and check console
-5. **Linting** - Run `npm run lint`, fix all issues
-6. **Build** - Run `npm run build`, ensure no errors
-7. **Iterate** - Repeat 3-6 until all checks pass
+2. **Dev Server** - Run `docker compose up -d --build`, check port with `docker compose port app 3000`, monitor logs for errors
+3. **Visual Verification** - Using Playwright MCP:
+   - Page renders without errors (no blank screen)
+   - Key UI elements visible (header, navigation, main content)
+   - No console errors/warnings
+   - Example: Navigate to `/`, verify header "My Blog" is present, check no console.error
+4. **Linting** - Run `docker compose run --rm app npm run lint`, fix all issues
+5. **Build** - Run `docker compose -f docker-compose.prod.yml build`, ensure no errors
+6. **Iterate** - Repeat 3-5 until all checks pass
 
 ## Serena Integration
 
@@ -28,9 +31,10 @@ Use **Serena MCP server** for semantic code operations. Use symbolic tools (find
 
 ## Key Commands
 
-- `npm run dev` - Start dev server (localhost:3000)
-- `npm run lint` - Run ESLint
-- `npm run build` - Production build
+- `docker compose up -d --build` - Start dev server (port is picked randomly)
+- `docker compose run --rm app npm run lint` - Run ESLint
+- `docker compose -f docker-compose.prod.yml build` - Production build
+- `docker compose -f docker-compose.prod.yml up --build -d` - Start production server
 
 ## Project Structure
 
@@ -38,7 +42,3 @@ Use **Serena MCP server** for semantic code operations. Use symbolic tools (find
 - `src/components/` - React components (shadcn/ui patterns)
 - `src/actions/` - Server actions (Notion API client)
 - `src/lib/` - Utilities
-
-## Important Notes
-
-Global header with "My Blog" link on all pages. Use Tailwind CSS for styling. Environment variables in `.env.local` (not committed). Test with Playwright to verify UI rendering and navigation.
