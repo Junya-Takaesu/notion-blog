@@ -27,13 +27,26 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   // Fetch real tags with counts from Notion
   const tags = await getBlogTags()
 
-  // Fetch recent posts from Notion (limit to 4 posts)
+  // Fetch all posts from Notion
   const allPosts = await getBlogPosts()
+
+  // Get recent posts (limit to 4 posts)
   const recentPosts = allPosts.slice(0, 4).map(post => ({
     title: post.title,
     date: post.date,
     href: post.href,
   }))
+
+  // Find current post index and get previous/next posts
+  const currentIndex = allPosts.findIndex(p => p.href === `/posts/${slug}`)
+  const previousPost = currentIndex > 0 ? {
+    title: allPosts[currentIndex - 1].title,
+    href: allPosts[currentIndex - 1].href,
+  } : undefined
+  const nextPost = currentIndex < allPosts.length - 1 ? {
+    title: allPosts[currentIndex + 1].title,
+    href: allPosts[currentIndex + 1].href,
+  } : undefined
 
 
 
@@ -53,14 +66,8 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             </BlogContent>
 
             <BlogNavigation
-              previousPost={{
-                title: "ハッカソンでIoT腹巻きを作ったら、競馬の冠レースを開催していた話",
-                href: "#",
-              }}
-              nextPost={{
-                title: "LLMに易しいOpenStack MCPサーバーの作り方",
-                href: "#",
-              }}
+              previousPost={previousPost}
+              nextPost={nextPost}
             />
 
             {/* Recent posts section for mobile - shown after navigation */}
