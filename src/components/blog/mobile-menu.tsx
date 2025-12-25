@@ -23,7 +23,13 @@ interface TocItem {
   level: number
 }
 
-export function MobileMenu({ tocItems, tags }: { tocItems: TocItem[], tags: Tag[] }) {
+interface MobileMenuProps {
+  tocItems: TocItem[]
+  tags: Tag[]
+  selectedTag?: string
+}
+
+export function MobileMenu({ tocItems, tags, selectedTag }: MobileMenuProps) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -43,7 +49,7 @@ export function MobileMenu({ tocItems, tags }: { tocItems: TocItem[], tags: Tag[
           <SheetTitle>メニュー</SheetTitle>
         </SheetHeader>
         <div className="mt-6">
-          <BlogSidebarContent tocItems={tocItems} tags={tags} onLinkClick={() => setOpen(false)} />
+          <BlogSidebarContent tocItems={tocItems} tags={tags} selectedTag={selectedTag} onLinkClick={() => setOpen(false)} />
         </div>
       </SheetContent>
     </Sheet>

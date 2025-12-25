@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { List } from "lucide-react"
+import Link from "next/link"
 
 interface Tag {
   name: string
@@ -23,6 +24,7 @@ interface BlogSidebarContentProps {
   tocItems?: TocItem[]
   tags?: Tag[]
   recentPosts?: RecentPost[]
+  selectedTag?: string
   onLinkClick?: () => void
 }
 
@@ -30,6 +32,7 @@ export function BlogSidebarContent({
   tocItems = [],
   tags = [],
   recentPosts = [],
+  selectedTag,
   onLinkClick
 }: BlogSidebarContentProps) {
   return (
@@ -67,17 +70,27 @@ export function BlogSidebarContent({
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {tags.map((tag, index) => (
-                <a
-                  key={index}
-                  href="#"
-                  onClick={onLinkClick}
-                >
-                  <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors">
-                    {tag.name} {tag.count}
-                  </Badge>
-                </a>
-              ))}
+              {tags.map((tag) => {
+                const isSelected = selectedTag === tag.name
+                return (
+                  <Link
+                    key={tag.name}
+                    href={isSelected ? "/" : `/?tag=${encodeURIComponent(tag.name)}`}
+                    onClick={onLinkClick}
+                  >
+                    <Badge
+                      variant={isSelected ? "default" : "secondary"}
+                      className={`cursor-pointer transition-colors ${
+                        isSelected
+                          ? "bg-red-500 hover:bg-red-600 text-white"
+                          : "hover:bg-secondary/80"
+                      }`}
+                    >
+                      {tag.name} {tag.count}
+                    </Badge>
+                  </Link>
+                )
+              })}
             </div>
           </CardContent>
         </Card>

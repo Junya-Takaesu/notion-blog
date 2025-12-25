@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 import { Calendar } from "lucide-react"
+import Link from "next/link"
 
 interface BlogHeaderProps {
   title: string
@@ -26,9 +27,11 @@ export function BlogHeader({ title, date, tags, slug }: BlogHeaderProps) {
       <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 text-balance break-words">{title}</h1>
       <div className="flex flex-wrap gap-2">
         {tags.map((tag) => (
-          <Badge key={tag} variant="secondary" className="text-xs sm:text-sm">
-            {tag}
-          </Badge>
+          <Link key={tag} href={`/?tag=${encodeURIComponent(tag)}`}>
+            <Badge variant="secondary" className="text-xs sm:text-sm cursor-pointer hover:bg-secondary/80 transition-colors">
+              {tag}
+            </Badge>
+          </Link>
         ))}
       </div>
     </header>

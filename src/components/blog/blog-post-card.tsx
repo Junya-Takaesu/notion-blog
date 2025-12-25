@@ -26,15 +26,22 @@ export function BlogPostCard({ title, excerpt, date, tags, href }: BlogPostCardP
         </CardHeader>
         <CardContent>
           <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 leading-relaxed line-clamp-3">{excerpt}</p>
-          <div className="flex flex-wrap gap-1.5 sm:gap-2">
-            {tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs sm:text-sm">
-                {tag}
-              </Badge>
-            ))}
-          </div>
         </CardContent>
       </Link>
+      <CardContent className="pt-0">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+          {tags.map((tag) => (
+            <Link
+              key={tag}
+              href={`/?tag=${encodeURIComponent(tag)}`}
+            >
+              <Badge variant="secondary" className="text-xs sm:text-sm cursor-pointer hover:bg-secondary/80 transition-colors">
+                {tag}
+              </Badge>
+            </Link>
+          ))}
+        </div>
+      </CardContent>
     </Card>
   )
 }
