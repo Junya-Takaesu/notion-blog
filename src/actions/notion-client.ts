@@ -288,7 +288,14 @@ function convertBlockToHtml(block: any, getHeadingId: () => number): string {
         }
         case 'code': {
             const text = block.code?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
-            return `<pre><code>${text}</code></pre>`;
+            const language = block.code?.language || 'plain text';
+            // Escape HTML entities in code
+            const escapedText = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+            return `<pre data-language="${language}"><code>${escapedText}</code></pre>`;
         }
         case 'quote': {
             const text = block.quote?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';

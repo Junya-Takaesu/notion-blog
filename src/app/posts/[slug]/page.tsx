@@ -6,6 +6,7 @@ import { MobileMenu } from "@/components/blog/mobile-menu"
 import { BlogSidebarContent } from "@/components/blog/blog-sidebar-content"
 import { getBlogPostBySlug, getBlogTags, getBlogPosts } from "@/actions/notion-client"
 import { extractHeadingsFromHtml } from "@/lib/extract-headings"
+import { highlightCodeBlocks } from "@/lib/syntax-highlight"
 import { notFound } from "next/navigation"
 
 // Force dynamic rendering for this page
@@ -21,8 +22,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     notFound()
   }
 
+  // Apply syntax highlighting to code blocks
+  const highlightedContent = await highlightCodeBlocks(post.content)
+
   // Extract table of contents from HTML content dynamically
-  const tocItems = extractHeadingsFromHtml(post.content)
+  const tocItems = extractHeadingsFromHtml(highlightedContent)
 
   // Fetch real tags with counts from Notion
   const tags = await getBlogTags()
@@ -62,7 +66,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           <main className="flex-1 min-w-0">
             <BlogContent>
-              <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              <div dangerouslySetInnerHTML={{ __html: highlightedContent }} />
             </BlogContent>
 
             <BlogNavigation
