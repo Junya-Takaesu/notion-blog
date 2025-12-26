@@ -27,7 +27,7 @@ export function BlogHeader({ title, date, tags, slug }: BlogHeaderProps) {
       <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 text-balance break-words">{title}</h1>
       <div className="flex flex-wrap gap-2">
         {tags.map((tag) => (
-          <Link key={tag} href={`/?tag=${encodeURIComponent(tag)}`}>
+          <Link key={tag} href={`/?tags=${encodeURIComponent(tag)}`}>
             <Badge variant="secondary" className="text-xs sm:text-sm cursor-pointer hover:bg-secondary/80 transition-colors">
               {tag}
             </Badge>

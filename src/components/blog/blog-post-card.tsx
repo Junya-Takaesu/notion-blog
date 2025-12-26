@@ -33,7 +33,7 @@ export function BlogPostCard({ title, excerpt, date, tags, href }: BlogPostCardP
           {tags.map((tag) => (
             <Link
               key={tag}
-              href={`/?tag=${encodeURIComponent(tag)}`}
+              href={`/?tags=${encodeURIComponent(tag)}`}
             >
               <Badge variant="secondary" className="text-xs sm:text-sm cursor-pointer hover:bg-secondary/80 transition-colors">
                 {tag}

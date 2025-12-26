@@ -24,7 +24,7 @@ interface BlogSidebarContentProps {
   tocItems?: TocItem[]
   tags?: Tag[]
   recentPosts?: RecentPost[]
-  selectedTag?: string
+  selectedTags?: string[]
   onLinkClick?: () => void
 }
 
@@ -32,7 +32,7 @@ export function BlogSidebarContent({
   tocItems = [],
   tags = [],
   recentPosts = [],
-  selectedTag,
+  selectedTags = [],
   onLinkClick
 }: BlogSidebarContentProps) {
   return (
@@ -71,11 +71,18 @@ export function BlogSidebarContent({
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag) => {
-                const isSelected = selectedTag === tag.name
+                const isSelected = selectedTags.includes(tag.name)
+                // Toggle tag: if selected, remove it; if not, add it
+                const newTags = isSelected
+                  ? selectedTags.filter(t => t !== tag.name)
+                  : [...selectedTags, tag.name]
+                const href = newTags.length > 0
+                  ? `/?tags=${newTags.map(t => encodeURIComponent(t)).join(',')}`
+                  : '/'
                 return (
                   <Link
                     key={tag.name}
-                    href={isSelected ? "/" : `/?tag=${encodeURIComponent(tag.name)}`}
+                    href={href}
                     onClick={onLinkClick}
                   >
                     <Badge

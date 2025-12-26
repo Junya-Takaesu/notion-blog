@@ -21,13 +21,13 @@ interface BlogSidebarProps {
   tocItems?: TocItem[]
   tags?: Tag[]
   recentPosts?: RecentPost[]
-  selectedTag?: string
+  selectedTags?: string[]
 }
 
-export function BlogSidebar({ tocItems = [], tags = [], recentPosts = [], selectedTag }: BlogSidebarProps) {
+export function BlogSidebar({ tocItems = [], tags = [], recentPosts = [], selectedTags = [] }: BlogSidebarProps) {
   return (
     <aside className="hidden lg:block">
-      <BlogSidebarContent tocItems={tocItems} tags={tags} recentPosts={recentPosts} selectedTag={selectedTag} />
+      <BlogSidebarContent tocItems={tocItems} tags={tags} recentPosts={recentPosts} selectedTags={selectedTags} />
     </aside>
   )
 }

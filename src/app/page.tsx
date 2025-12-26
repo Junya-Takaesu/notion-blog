@@ -10,17 +10,22 @@ import Link from "next/link"
 export const dynamic = 'force-dynamic'
 
 interface BlogListPageProps {
-  searchParams: Promise<{ tag?: string }>
+  searchParams: Promise<{ tags?: string }>
 }
 
 export default async function BlogListPage({ searchParams }: BlogListPageProps) {
-  const { tag: selectedTag } = await searchParams
+  const { tags: tagsParam } = await searchParams
   const allBlogPosts = await getBlogPosts()
   const tags = await getBlogTags()
 
-  // Filter posts by tag if selectedTag is provided
-  const blogPosts = selectedTag
-    ? allBlogPosts.filter(post => post.tags.includes(selectedTag))
+  // Parse selected tags from comma-separated URL parameter
+  const selectedTags = tagsParam
+    ? tagsParam.split(',').map(t => decodeURIComponent(t)).filter(Boolean)
+    : []
+
+  // Filter posts by tags (OR condition) if any tags are selected
+  const blogPosts = selectedTags.length > 0
+    ? allBlogPosts.filter(post => selectedTags.some(tag => post.tags.includes(tag)))
     : allBlogPosts
 
   // Fetch recent posts from Notion (limit to 4 posts)
@@ -38,16 +43,33 @@ export default async function BlogListPage({ searchParams }: BlogListPageProps) 
           <hr />
         </div>
 
-        {/* Selected tag indicator */}
-        {selectedTag && (
-          <div className="mb-6 flex items-center gap-2">
+        {/* Selected tags indicator */}
+        {selectedTags.length > 0 && (
+          <div className="mb-6 flex items-center gap-2 flex-wrap">
             <span className="text-sm text-muted-foreground">絞り込み:</span>
-            <Link href="/">
-              <Badge className="bg-red-500 hover:bg-red-600 text-white cursor-pointer flex items-center gap-1">
-                {selectedTag}
-                <X className="h-3 w-3" />
-              </Badge>
-            </Link>
+            {selectedTags.map(tag => {
+              // Create new URL without this tag
+              const remainingTags = selectedTags.filter(t => t !== tag)
+              const href = remainingTags.length > 0
+                ? `/?tags=${remainingTags.map(t => encodeURIComponent(t)).join(',')}`
+                : '/'
+              return (
+                <Link key={tag} href={href}>
+                  <Badge className="bg-red-500 hover:bg-red-600 text-white cursor-pointer flex items-center gap-1">
+                    {tag}
+                    <X className="h-3 w-3" />
+                  </Badge>
+                </Link>
+              )
+            })}
+            {selectedTags.length > 1 && (
+              <Link href="/">
+                <Badge variant="outline" className="cursor-pointer flex items-center gap-1 hover:bg-secondary">
+                  すべてクリア
+                  <X className="h-3 w-3" />
+                </Badge>
+              </Link>
+            )}
           </div>
         )}
 
@@ -65,12 +87,12 @@ export default async function BlogListPage({ searchParams }: BlogListPageProps) 
           </main>
 
           <aside className="w-full lg:w-80 lg:flex-shrink-0">
-            <BlogSidebar tags={tags} recentPosts={recentPosts} selectedTag={selectedTag} />
+            <BlogSidebar tags={tags} recentPosts={recentPosts} selectedTags={selectedTags} />
           </aside>
         </div>
       </div>
       {/* Mobile hamburger menu with TOC and tags */}
-      <MobileMenu tocItems={[]} tags={tags} selectedTag={selectedTag} />
+      <MobileMenu tocItems={[]} tags={tags} selectedTags={selectedTags} />
     </div>
   )
 }
