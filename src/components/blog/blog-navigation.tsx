@@ -17,24 +17,23 @@ export function BlogNavigation({
   nextPost,
 }: BlogNavigationProps) {
   return (
-    <nav className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-12 pt-8 border-t border-border">
+    <nav className="flex flex-col sm:flex-row sm:items-stretch sm:justify-between gap-4 mt-12 pt-8 border-t border-border">
       {previousPost ? (
         <Button
-          variant="ghost"
+          variant="outline"
           asChild
-          className="flex-1 justify-start h-auto py-4 w-full sm:w-auto min-w-0"
+          className="flex-1 h-auto py-4 px-4 justify-start gap-3 whitespace-normal"
         >
-          <a
-            href={previousPost.href}
-            className="flex items-start gap-2 min-w-0"
-          >
-            <ChevronLeft className="h-5 w-5 mt-0.5 flex-shrink-0" />
-            <div className="text-left min-w-0 flex-1">
-              <div className="text-xs text-muted-foreground mb-1">前の記事</div>
-              <div className="text-sm font-medium whitespace-normal">
+          <a href={previousPost.href}>
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-muted flex-shrink-0">
+              <ChevronLeft className="h-4 w-4" />
+            </span>
+            <span className="text-left min-w-0 flex-1">
+              <span className="block text-xs text-muted-foreground mb-1">前の記事</span>
+              <span className="block text-sm font-medium line-clamp-2">
                 {previousPost.title}
-              </div>
-            </div>
+              </span>
+            </span>
           </a>
         </Button>
       ) : (
@@ -43,19 +42,20 @@ export function BlogNavigation({
 
       {nextPost ? (
         <Button
-          variant="ghost"
+          variant="outline"
           asChild
-          className="flex-1 justify-start sm:justify-end h-auto py-4 w-full sm:w-auto min-w-0"
+          className="flex-1 h-auto py-4 px-4 justify-start sm:justify-end gap-3 whitespace-normal sm:flex-row-reverse"
         >
-          <a href={nextPost.href} className="flex items-start gap-2 min-w-0">
-            <div className="text-left sm:text-right min-w-0 flex-1">
-              <div className="text-xs text-muted-foreground mb-1">次の記事</div>
-              <div className="text-sm font-medium whitespace-normal">
+          <a href={nextPost.href}>
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-muted flex-shrink-0">
+              <ChevronRight className="h-4 w-4" />
+            </span>
+            <span className="text-left sm:text-right min-w-0 flex-1">
+              <span className="block text-xs text-muted-foreground mb-1">次の記事</span>
+              <span className="block text-sm font-medium line-clamp-2">
                 {nextPost.title}
-              </div>
-            </div>
-            <ChevronRight className="h-5 w-5 mt-0.5 flex-shrink-0 sm:hidden" />
-            <ChevronRight className="hidden sm:block h-5 w-5 mt-0.5 flex-shrink-0" />
+              </span>
+            </span>
           </a>
         </Button>
       ) : (
