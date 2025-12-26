@@ -42,7 +42,7 @@ yarn-error.log*
 next-env.d.ts
 
 # Claude Code and development tools
-.claude
+.claude/settings.local.json
 .serena
 .playwright-mcp
 
