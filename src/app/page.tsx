@@ -1,7 +1,8 @@
-import { BlogPostCard } from "@/components/blog/blog-post-card"
-import { BlogSidebar } from "@/components/blog/blog-sidebar"
-import { MobileMenu } from "@/components/blog/mobile-menu"
-import { getBlogPosts, getBlogTags } from "@/actions/notion-client"
+import { Suspense } from "react"
+import { BlogPostList } from "@/components/blog/blog-post-list"
+import { SidebarData } from "@/components/blog/sidebar-data"
+import { MobileMenuData } from "@/components/blog/mobile-menu-data"
+import { BlogPostListSkeleton, BlogSidebarSkeleton } from "@/components/blog/skeletons"
 import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
 import Link from "next/link"
@@ -15,25 +16,11 @@ interface BlogListPageProps {
 
 export default async function BlogListPage({ searchParams }: BlogListPageProps) {
   const { tags: tagsParam } = await searchParams
-  const allBlogPosts = await getBlogPosts()
-  const tags = await getBlogTags()
 
   // Parse selected tags from comma-separated URL parameter
   const selectedTags = tagsParam
     ? tagsParam.split(',').map(t => decodeURIComponent(t)).filter(Boolean)
     : []
-
-  // Filter posts by tags (OR condition) if any tags are selected
-  const blogPosts = selectedTags.length > 0
-    ? allBlogPosts.filter(post => selectedTags.some(tag => post.tags.includes(tag)))
-    : allBlogPosts
-
-  // Fetch recent posts from Notion (limit to 4 posts)
-  const recentPosts = allBlogPosts.slice(0, 4).map(post => ({
-    title: post.title,
-    date: post.date,
-    href: post.href,
-  }))
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,24 +62,22 @@ export default async function BlogListPage({ searchParams }: BlogListPageProps) 
 
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           <main className="flex-1 min-w-0">
-            <div className="space-y-6">
-              {blogPosts.length > 0 ? (
-                blogPosts.map((post, index) => (
-                  <BlogPostCard key={index} {...post} />
-                ))
-              ) : (
-                <p className="text-muted-foreground">該当する記事がありません。</p>
-              )}
-            </div>
+            <Suspense fallback={<BlogPostListSkeleton count={3} />}>
+              <BlogPostList selectedTags={selectedTags} />
+            </Suspense>
           </main>
 
-          <aside className="w-full lg:w-80 lg:flex-shrink-0">
-            <BlogSidebar tags={tags} recentPosts={recentPosts} selectedTags={selectedTags} />
+          <aside className="w-full lg:w-80 lg:flex-shrink-0 hidden lg:block">
+            <Suspense fallback={<BlogSidebarSkeleton />}>
+              <SidebarData selectedTags={selectedTags} />
+            </Suspense>
           </aside>
         </div>
       </div>
       {/* Mobile hamburger menu with TOC and tags */}
-      <MobileMenu tocItems={[]} tags={tags} selectedTags={selectedTags} />
+      <Suspense fallback={null}>
+        <MobileMenuData selectedTags={selectedTags} />
+      </Suspense>
     </div>
   )
 }
