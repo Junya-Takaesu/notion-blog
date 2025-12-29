@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { List, ExternalLink } from "lucide-react"
 import Link from "next/link"
+import { SourceIcon } from "./source-icon"
 
 interface Tag {
   name: string
@@ -19,6 +20,7 @@ interface RecentPost {
   date: string
   href: string
   isExternal?: boolean
+  source?: string
 }
 
 interface BlogSidebarContentProps {
@@ -122,15 +124,19 @@ export function BlogSidebarContent({
                       onClick={onLinkClick}
                     >
                       <time className="text-xs text-muted-foreground block mb-1">{post.date}</time>
-                      <p className="text-sm leading-snug group-hover:text-primary transition-colors flex items-center gap-1">
-                        {post.title}
+                      <p className="text-sm leading-snug group-hover:text-primary transition-colors flex items-center gap-1.5">
+                        {post.source && <SourceIcon source={post.source} size={14} className="text-muted-foreground flex-shrink-0" />}
+                        <span className="flex-1">{post.title}</span>
                         <ExternalLink className="h-3 w-3 flex-shrink-0 text-muted-foreground/70" />
                       </p>
                     </a>
                   ) : (
                     <Link href={post.href} className="block group" onClick={onLinkClick}>
                       <time className="text-xs text-muted-foreground block mb-1">{post.date}</time>
-                      <p className="text-sm leading-snug group-hover:text-primary transition-colors">{post.title}</p>
+                      <p className="text-sm leading-snug group-hover:text-primary transition-colors flex items-center gap-1.5">
+                        {post.source && <SourceIcon source={post.source} size={14} className="text-muted-foreground flex-shrink-0" />}
+                        <span>{post.title}</span>
+                      </p>
                     </Link>
                   )}
                 </li>

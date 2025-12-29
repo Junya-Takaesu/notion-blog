@@ -16,6 +16,7 @@ export async function SidebarData({ selectedTags }: SidebarDataProps) {
     date: post.date,
     href: post.href,
     isExternal: post.isExternal,
+    source: post.source,
   }))
 
   return (

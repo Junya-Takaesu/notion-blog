@@ -9,6 +9,8 @@ interface RecentPost {
   title: string
   date: string
   href: string
+  isExternal?: boolean
+  source?: string
 }
 
 interface TocItem {

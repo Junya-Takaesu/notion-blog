@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, ExternalLink } from "lucide-react"
 import Link from "next/link"
+import { SourceIcon } from "./source-icon"
 
 interface BlogPostCardProps {
   title: string
@@ -39,7 +40,10 @@ export function BlogPostCard({ title, excerpt, date, tags, href, source, isExter
           {source && (
             <>
               <span className="text-muted-foreground/50">•</span>
-              <span className="capitalize">{source}</span>
+              <div className="flex items-center gap-1.5">
+                <SourceIcon source={source} size={14} className="text-muted-foreground" />
+                <span className="capitalize">{source}</span>
+              </div>
             </>
           )}
           {isExternal && (

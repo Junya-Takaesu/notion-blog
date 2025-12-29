@@ -27,6 +27,7 @@ export async function PostSidebarData({ slug }: PostSidebarDataProps) {
     date: post.date,
     href: post.href,
     isExternal: post.isExternal,
+    source: post.source,
   }))
 
   return (
