@@ -59,6 +59,7 @@ export function BlogPostCard({ title, excerpt, date, tags, href, source, isExter
             <Link
               key={tag}
               href={`/?tags=${encodeURIComponent(tag)}`}
+              className="relative z-10"
             >
               <Badge
                 variant="secondary"
