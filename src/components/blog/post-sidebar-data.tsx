@@ -1,5 +1,5 @@
 import { BlogSidebarContent } from "./blog-sidebar-content"
-import { getBlogPostBySlug, getBlogPosts, getBlogTags } from "@/actions/notion-client"
+import { getBlogPostBySlug, getBlogPosts, getBlogTags } from "@/actions/blog"
 import { extractHeadingsFromHtml } from "@/lib/extract-headings"
 import { highlightCodeBlocks } from "@/lib/syntax-highlight"
 
@@ -26,6 +26,7 @@ export async function PostSidebarData({ slug }: PostSidebarDataProps) {
     title: post.title,
     date: post.date,
     href: post.href,
+    isExternal: post.isExternal,
   }))
 
   return (

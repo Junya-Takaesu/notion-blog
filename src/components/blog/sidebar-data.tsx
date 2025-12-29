@@ -1,5 +1,5 @@
 import { BlogSidebarContent } from "./blog-sidebar-content"
-import { getBlogPosts, getBlogTags } from "@/actions/notion-client"
+import { getBlogPosts, getBlogTags } from "@/actions/blog"
 
 interface SidebarDataProps {
   selectedTags: string[]
@@ -15,6 +15,7 @@ export async function SidebarData({ selectedTags }: SidebarDataProps) {
     title: post.title,
     date: post.date,
     href: post.href,
+    isExternal: post.isExternal,
   }))
 
   return (

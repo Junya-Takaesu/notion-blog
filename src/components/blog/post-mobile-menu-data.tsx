@@ -1,5 +1,5 @@
 import { MobileMenu } from "./mobile-menu"
-import { getBlogPostBySlug, getBlogTags } from "@/actions/notion-client"
+import { getBlogPostBySlug, getBlogTags } from "@/actions/blog"
 import { extractHeadingsFromHtml } from "@/lib/extract-headings"
 import { highlightCodeBlocks } from "@/lib/syntax-highlight"
 

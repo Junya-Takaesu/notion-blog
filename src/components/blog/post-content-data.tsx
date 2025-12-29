@@ -2,7 +2,7 @@ import { BlogHeader } from "@/components/blog/blog-header"
 import { BlogContent } from "@/components/blog/blog-content"
 import { BlogNavigation } from "@/components/blog/blog-navigation"
 import { BlogSidebarContent } from "@/components/blog/blog-sidebar-content"
-import { getBlogPostBySlug, getBlogPosts } from "@/actions/notion-client"
+import { getBlogPostBySlug, getBlogPosts } from "@/actions/blog"
 import { extractHeadingsFromHtml } from "@/lib/extract-headings"
 import { highlightCodeBlocks } from "@/lib/syntax-highlight"
 import { notFound } from "next/navigation"
@@ -21,25 +21,29 @@ export async function PostContentData({ slug }: PostContentDataProps) {
   // Apply syntax highlighting to code blocks
   const highlightedContent = await highlightCodeBlocks(post.content)
 
-  // Fetch all posts from Notion
+  // Fetch all posts
   const allPosts = await getBlogPosts()
+
+  // Notionの記事のみ（内部リンク）をナビゲーション対象とする
+  const notionPosts = allPosts.filter(p => !p.isExternal)
 
   // Get recent posts (limit to 4 posts)
   const recentPosts = allPosts.slice(0, 4).map(post => ({
     title: post.title,
     date: post.date,
     href: post.href,
+    isExternal: post.isExternal,
   }))
 
-  // Find current post index and get previous/next posts
-  const currentIndex = allPosts.findIndex(p => p.href === `/posts/${slug}`)
+  // Find current post index and get previous/next posts (Notionの記事のみ)
+  const currentIndex = notionPosts.findIndex(p => p.href === `/posts/${slug}`)
   const previousPost = currentIndex > 0 ? {
-    title: allPosts[currentIndex - 1].title,
-    href: allPosts[currentIndex - 1].href,
+    title: notionPosts[currentIndex - 1].title,
+    href: notionPosts[currentIndex - 1].href,
   } : undefined
-  const nextPost = currentIndex < allPosts.length - 1 ? {
-    title: allPosts[currentIndex + 1].title,
-    href: allPosts[currentIndex + 1].href,
+  const nextPost = currentIndex < notionPosts.length - 1 ? {
+    title: notionPosts[currentIndex + 1].title,
+    href: notionPosts[currentIndex + 1].href,
   } : undefined
 
   return (
