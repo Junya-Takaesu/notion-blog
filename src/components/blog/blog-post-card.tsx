@@ -58,7 +58,7 @@ export function BlogPostCard({ title, excerpt, date, tags, href, source, isExter
         <Link href={href} className="absolute inset-0 z-0" aria-label={`${title}を読む`} />
       )}
 
-      <CardHeader className="pb-3 sm:pb-4">
+      <CardHeader className="pb-3 sm:pb-4 pointer-events-none">
         <div className={`flex items-center gap-2 text-xs sm:text-sm mb-2 sm:mb-3 ${styles.mutedTextClassName || 'text-muted-foreground'}`}>
           <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
           <time dateTime={date}>{date}</time>
@@ -79,16 +79,16 @@ export function BlogPostCard({ title, excerpt, date, tags, href, source, isExter
           {title}
         </h2>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pointer-events-none">
         <p className={`text-sm sm:text-base mb-3 sm:mb-4 leading-relaxed line-clamp-3 ${styles.mutedTextClassName || 'text-muted-foreground'}`}>{excerpt}</p>
       </CardContent>
       <CardContent className="pt-0">
-        <div className="flex flex-wrap gap-1.5 sm:gap-2 relative z-10">
+        <div className="inline-flex flex-wrap gap-1.5 sm:gap-2 relative z-10 pointer-events-auto">
           {tags.map((tag) => (
             <Link
               key={tag}
               href={`/?tags=${encodeURIComponent(tag)}`}
-              className="relative z-10"
+              className="relative z-10 pointer-events-auto"
             >
               <Badge
                 variant="secondary"
