@@ -3,6 +3,7 @@ import { BlogPost, FetchResult, TagWithCount } from "@/lib/types/blog";
 import { BlogProvider } from "./blog-provider";
 import { notionProvider } from "./notion-provider";
 import { getQiitaProvider } from "./qiita-provider";
+import { getZennProvider } from "./zenn-provider";
 
 const MIN_POSTS_THRESHOLD = 15;
 
@@ -29,6 +30,11 @@ export function getActiveProviders(): BlogProvider[] {
   const qiitaProvider = getQiitaProvider();
   if (qiitaProvider) {
     providers.push(qiitaProvider);
+  }
+
+  const zennProvider = getZennProvider();
+  if (zennProvider) {
+    providers.push(zennProvider);
   }
 
   return providers;

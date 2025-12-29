@@ -8,7 +8,7 @@ export interface BlogPost {
   date: string;
   tags: string[];
   href: string;           // Notion: /posts/xxx, Qiita: https://qiita.com/...
-  source: 'notion' | 'qiita' | string;  // 将来の拡張用
+  source: 'notion' | 'qiita' | 'zenn' | string;  // 将来の拡張用
   isExternal: boolean;    // Qiita: true, Notion: false
 }
 
