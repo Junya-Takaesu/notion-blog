@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { List } from "lucide-react"
+import { List, ExternalLink } from "lucide-react"
 import Link from "next/link"
 
 interface Tag {
@@ -18,6 +18,7 @@ interface RecentPost {
   title: string
   date: string
   href: string
+  isExternal?: boolean
 }
 
 interface BlogSidebarContentProps {
@@ -112,10 +113,26 @@ export function BlogSidebarContent({
             <ul className="space-y-4">
               {recentPosts.map((post, index) => (
                 <li key={index}>
-                  <a href={post.href} className="block group" onClick={onLinkClick}>
-                    <time className="text-xs text-muted-foreground block mb-1">{post.date}</time>
-                    <p className="text-sm leading-snug group-hover:text-primary transition-colors">{post.title}</p>
-                  </a>
+                  {post.isExternal ? (
+                    <a
+                      href={post.href}
+                      className="block group"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={onLinkClick}
+                    >
+                      <time className="text-xs text-muted-foreground block mb-1">{post.date}</time>
+                      <p className="text-sm leading-snug group-hover:text-primary transition-colors flex items-center gap-1">
+                        {post.title}
+                        <ExternalLink className="h-3 w-3 flex-shrink-0 text-muted-foreground/70" />
+                      </p>
+                    </a>
+                  ) : (
+                    <Link href={post.href} className="block group" onClick={onLinkClick}>
+                      <time className="text-xs text-muted-foreground block mb-1">{post.date}</time>
+                      <p className="text-sm leading-snug group-hover:text-primary transition-colors">{post.title}</p>
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

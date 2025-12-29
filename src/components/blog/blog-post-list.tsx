@@ -1,27 +1,44 @@
 import { BlogPostCard } from "@/components/blog/blog-post-card"
-import { getBlogPosts } from "@/actions/notion-client"
+import { getBlogPosts, getInitialPosts } from "@/actions/blog"
+import { BlogPostListClient } from "./blog-post-list-client"
 
 interface BlogPostListProps {
   selectedTags: string[]
 }
 
 export async function BlogPostList({ selectedTags }: BlogPostListProps) {
-  const allBlogPosts = await getBlogPosts()
+  // タグフィルタリングがある場合は全記事取得、ない場合はしきい値分のみ取得
+  if (selectedTags.length > 0) {
+    const allBlogPosts = await getBlogPosts()
+    const filteredPosts = allBlogPosts.filter(post =>
+      selectedTags.some(tag => post.tags.includes(tag))
+    )
 
-  // Filter posts by tags (OR condition) if any tags are selected
-  const blogPosts = selectedTags.length > 0
-    ? allBlogPosts.filter(post => selectedTags.some(tag => post.tags.includes(tag)))
-    : allBlogPosts
+    if (filteredPosts.length === 0) {
+      return <p className="text-muted-foreground">該当する記事がありません。</p>
+    }
 
-  if (blogPosts.length === 0) {
+    return (
+      <div className="space-y-6">
+        {filteredPosts.map((post) => (
+          <BlogPostCard key={post.href} {...post} />
+        ))}
+      </div>
+    )
+  }
+
+  // Lazy Load: 初回はしきい値分のみ取得
+  const { posts: initialPosts, lastYearMonth, hasMore } = await getInitialPosts()
+
+  if (initialPosts.length === 0) {
     return <p className="text-muted-foreground">該当する記事がありません。</p>
   }
 
   return (
-    <div className="space-y-6">
-      {blogPosts.map((post) => (
-        <BlogPostCard key={post.href} {...post} />
-      ))}
-    </div>
+    <BlogPostListClient
+      initialPosts={initialPosts}
+      initialLastYearMonth={lastYearMonth}
+      initialHasMore={hasMore}
+    />
   )
 }

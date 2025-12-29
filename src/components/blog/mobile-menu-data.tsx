@@ -1,5 +1,5 @@
 import { MobileMenu } from "./mobile-menu"
-import { getBlogTags } from "@/actions/notion-client"
+import { getBlogTags } from "@/actions/blog"
 
 interface MobileMenuDataProps {
   selectedTags: string[]
