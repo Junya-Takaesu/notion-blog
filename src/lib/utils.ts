@@ -25,7 +25,7 @@ export function getSiteUrl(): string {
 // サイト共通設定（1箇所で管理）
 // ========================================
 export const SITE_CONFIG = {
-  name: 'Rust Go Python Blog',
+  name: '＼ Rust Go Python Blog',
   description: 'Rust Go Python Blog - ITに関する様々なトピックを扱うブログ',
   locale: 'ja_JP',
 } as const
