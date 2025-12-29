@@ -19,8 +19,33 @@ export function BlogPostCard({ title, excerpt, date, tags, href, source, isExter
     ? { target: "_blank" as const, rel: "noopener noreferrer" }
     : {};
 
+  // ソースに応じた背景色と文字色の設定
+  const getCardStyles = () => {
+    if (source === 'qiita') {
+      return {
+        cardClassName: "group relative shadow-sm hover:shadow-xl transition-shadow bg-[#55C500] border-[#55C500]",
+        textClassName: "text-white",
+        mutedTextClassName: "text-white/90",
+      };
+    }
+    if (source === 'zenn') {
+      return {
+        cardClassName: "group relative shadow-sm hover:shadow-xl transition-shadow bg-[#3EA8FF] border-[#3EA8FF]",
+        textClassName: "text-white",
+        mutedTextClassName: "text-white/90",
+      };
+    }
+    return {
+      cardClassName: "group relative shadow-sm hover:shadow-lg transition-shadow",
+      textClassName: "",
+      mutedTextClassName: "",
+    };
+  };
+
+  const styles = getCardStyles();
+
   return (
-    <Card className="group relative hover:shadow-lg transition-shadow">
+    <Card className={styles.cardClassName}>
       {/* カード全体をクリック可能にするリンク */}
       {isExternal ? (
         <a
@@ -34,28 +59,28 @@ export function BlogPostCard({ title, excerpt, date, tags, href, source, isExter
       )}
 
       <CardHeader className="pb-3 sm:pb-4">
-        <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3">
+        <div className={`flex items-center gap-2 text-xs sm:text-sm mb-2 sm:mb-3 ${styles.mutedTextClassName || 'text-muted-foreground'}`}>
           <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
           <time dateTime={date}>{date}</time>
           {source && (
             <>
-              <span className="text-muted-foreground/50">•</span>
+              <span className={styles.mutedTextClassName ? "text-white/70" : "text-muted-foreground/50"}>•</span>
               <div className="flex items-center gap-1.5">
-                <SourceIcon source={source} size={14} className="text-muted-foreground" />
+                <SourceIcon source={source} size={14} className={styles.mutedTextClassName || "text-muted-foreground"} />
                 <span className="capitalize">{source}</span>
               </div>
             </>
           )}
           {isExternal && (
-            <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground/70" />
+            <ExternalLink className={`h-3 w-3 sm:h-4 sm:w-4 ${styles.mutedTextClassName ? "text-white/80" : "text-muted-foreground/70"}`} />
           )}
         </div>
-        <h2 className="text-xl sm:text-2xl font-bold group-hover:text-primary transition-colors text-balance leading-snug break-words flex items-center gap-2">
+        <h2 className={`text-xl sm:text-2xl font-bold transition-colors text-balance leading-snug break-words flex items-center gap-2 ${styles.textClassName ? `${styles.textClassName} group-hover:opacity-90` : 'group-hover:text-primary'}`}>
           {title}
         </h2>
       </CardHeader>
       <CardContent>
-        <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 leading-relaxed line-clamp-3">{excerpt}</p>
+        <p className={`text-sm sm:text-base mb-3 sm:mb-4 leading-relaxed line-clamp-3 ${styles.mutedTextClassName || 'text-muted-foreground'}`}>{excerpt}</p>
       </CardContent>
       <CardContent className="pt-0">
         <div className="flex flex-wrap gap-1.5 sm:gap-2 relative z-10">
@@ -67,7 +92,11 @@ export function BlogPostCard({ title, excerpt, date, tags, href, source, isExter
             >
               <Badge
                 variant="secondary"
-                className="text-xs sm:text-sm cursor-pointer hover:shadow-lg transition-all duration-200"
+                className={`text-xs sm:text-sm cursor-pointer hover:shadow-lg transition-all duration-200 ${
+                  styles.textClassName 
+                    ? 'bg-white/20 text-white hover:bg-white/30' 
+                    : ''
+                }`}
               >
                 {tag}
               </Badge>
