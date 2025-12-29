@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RGP's",
-  description: "RGP's Blog",
+  title: "Rust Go Python Blog",
+  description: "Rust Go Python Blog",
 };
 
 export default function RootLayout({
@@ -31,7 +31,7 @@ export default function RootLayout({
         <header className="border-b">
           <div className="container mx-auto px-4 py-4">
             <Link href="/" className="text-2xl font-bold hover:text-gray-600 transition-colors">
-              RGPs Blog
+              Rust Go Python Blog
             </Link>
           </div>
         </header>
