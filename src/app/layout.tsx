@@ -14,8 +14,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rust Go Python Blog",
+  title: {
+    default: "Rust Go Python Blog",
+    template: "%s | Rust Go Python Blog",
+  },
   description: "Rust Go Python Blog",
+  openGraph: {
+    title: "Rust Go Python Blog",
+    description: "Rust Go Python Blog - ITに関する様々なトピックを扱うブログ",
+    type: "website",
+    locale: "ja_JP",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rust Go Python Blog",
+    description: "Rust Go Python Blog - ITに関する様々なトピックを扱うブログ",
+  },
 };
 
 export default function RootLayout({

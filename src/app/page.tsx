@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import type { Metadata } from "next"
 import { BlogPostList } from "@/components/blog/blog-post-list"
 import { SidebarData } from "@/components/blog/sidebar-data"
 import { MobileMenuData } from "@/components/blog/mobile-menu-data"
@@ -9,6 +10,11 @@ import Link from "next/link"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: "記事一覧",
+  description: "Rust Go Python Blog の記事一覧",
+}
 
 interface BlogListPageProps {
   searchParams: Promise<{ tags?: string }>

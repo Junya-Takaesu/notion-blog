@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import type { Metadata } from "next"
 import { PostContentData } from "@/components/blog/post-content-data"
 import { PostSidebarData } from "@/components/blog/post-sidebar-data"
 import { PostMobileMenuData } from "@/components/blog/post-mobile-menu-data"
@@ -8,9 +9,55 @@ import {
   BlogNavigationSkeleton,
   BlogSidebarSkeleton,
 } from "@/components/blog/skeletons"
+import { getBlogPostBySlug } from "@/actions/blog"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const post = await getBlogPostBySlug(slug)
+  
+  if (!post) {
+    return {
+      title: '記事が見つかりません',
+      description: '指定された記事が見つかりませんでした。',
+    }
+  }
+
+  // 説明文を生成（HTMLタグを除去して最初の160文字）
+  const plainText = post.content
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const description = plainText.length > 160 
+    ? plainText.substring(0, 157) + '...'
+    : plainText || '技術ブログ記事'
+
+  // サイトURLを環境変数から取得（本番環境では設定が必要）
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}` 
+    : 'https://your-domain.com'
+
+  return {
+    title: post.title,
+    description,
+    openGraph: {
+      title: post.title,
+      description,
+      type: 'article',
+      publishedTime: post.createdTime,
+      modifiedTime: post.lastEditedTime,
+      tags: post.tags,
+      url: `${siteUrl}/posts/${slug}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description,
+    },
+  }
+}
 
 function PostContentSkeleton() {
   return (
@@ -22,7 +69,7 @@ function PostContentSkeleton() {
   )
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 
   return (
