@@ -6,7 +6,7 @@ services:
       target: development
     container_name: notion-blog-dev
     ports:
-      - "3000"
+      - "41234:3000"
     volumes:
       # Mount source code for hot reload
       - .:/app

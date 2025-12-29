@@ -1,7 +1,8 @@
 import { ImageResponse } from 'next/og'
+import { SITE_CONFIG } from '@/lib/utils'
 
 export const runtime = 'edge'
-export const alt = 'Rust Go Python Blog'
+export const alt = SITE_CONFIG.name
 export const size = {
   width: 1200,
   height: 630,
@@ -86,7 +87,7 @@ export default async function Image() {
                 textAlign: 'center',
               }}
             >
-              Rust Go Python Blog
+              {SITE_CONFIG.name}
             </h1>
           </div>
           <p
@@ -97,7 +98,7 @@ export default async function Image() {
               textAlign: 'center',
             }}
           >
-            Rust Go Python Blog - ITに関する様々なトピックを扱うブログ
+            ${SITE_CONFIG.description}
           </p>
         </div>
       </div>

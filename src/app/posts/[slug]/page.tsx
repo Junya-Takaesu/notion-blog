@@ -10,6 +10,7 @@ import {
   BlogSidebarSkeleton,
 } from "@/components/blog/skeletons"
 import { getBlogPostBySlug } from "@/actions/blog"
+import { generateDescription, generateArticleMetadata } from "@/lib/utils"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -25,38 +26,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  // 説明文を生成（HTMLタグを除去して最初の160文字）
-  const plainText = post.content
-    .replace(/<[^>]*>/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-  const description = plainText.length > 160 
-    ? plainText.substring(0, 157) + '...'
-    : plainText || '技術ブログ記事'
-
-  // サイトURLを環境変数から取得（本番環境では設定が必要）
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
-    : 'https://your-domain.com'
-
-  return {
+  return generateArticleMetadata({
     title: post.title,
-    description,
-    openGraph: {
-      title: post.title,
-      description,
-      type: 'article',
-      publishedTime: post.createdTime,
-      modifiedTime: post.lastEditedTime,
-      tags: post.tags,
-      url: `${siteUrl}/posts/${slug}`,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.title,
-      description,
-    },
-  }
+    description: generateDescription(post.content),
+    slug,
+    publishedTime: post.createdTime,
+    modifiedTime: post.lastEditedTime,
+    tags: post.tags,
+  })
 }
 
 function PostContentSkeleton() {

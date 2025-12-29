@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { getBlogPostBySlug } from '@/actions/blog'
+import { SITE_CONFIG } from '@/lib/utils'
 
 export const runtime = 'edge'
 export const alt = 'ブログ記事のOG画像'
@@ -184,7 +185,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                 color: '#a0a0a0',
               }}
             >
-              Rust Go Python Blog
+              {SITE_CONFIG.description}
             </p>
           </div>
         </div>

@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
+import { generateSiteMetadata } from "@/lib/utils";
 import "./globals.css";
+import { SITE_CONFIG } from "@/lib/utils";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,24 +14,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Rust Go Python Blog",
-    template: "%s | Rust Go Python Blog",
-  },
-  description: "Rust Go Python Blog",
-  openGraph: {
-    title: "Rust Go Python Blog",
-    description: "Rust Go Python Blog - ITに関する様々なトピックを扱うブログ",
-    type: "website",
-    locale: "ja_JP",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Rust Go Python Blog",
-    description: "Rust Go Python Blog - ITに関する様々なトピックを扱うブログ",
-  },
-};
+export const metadata = generateSiteMetadata();
 
 export default function RootLayout({
   children,
@@ -45,7 +29,7 @@ export default function RootLayout({
         <header className="border-b">
           <div className="container mx-auto px-4 py-4">
             <Link href="/" className="text-2xl font-bold hover:text-gray-600 transition-colors">
-              Rust Go Python Blog
+              {SITE_CONFIG.name}
             </Link>
           </div>
         </header>
