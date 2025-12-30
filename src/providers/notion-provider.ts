@@ -1,6 +1,7 @@
 import { Client } from "@notionhq/client";
 import { BlogPost, BlogPostDetail } from "@/lib/types/blog";
 import { CacheConfig, DetailableBlogProvider } from "./blog-provider";
+import { getLinkPreview } from "link-preview-js";
 
 function validateEnvVar(value: string | undefined, name: string): string {
   if (!value || value.trim() === '') {
@@ -62,14 +63,92 @@ function escapeHtmlContent(str: string): string {
     .replace(/>/g, '&gt;');
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function convertBlockToHtml(block: any, getHeadingId: () => number): string {
-  const type = block.type;
+/**
+ * ブックマークカードHTMLを生成（mentionタイプ用）
+ */
+async function renderBookmarkCard(href: string): Promise<string> {
+  try {
+    const linkPreview = await getLinkPreview(href) as {
+      url?: string;
+      title?: string;
+      description?: string;
+      images?: string[];
+      favicons?: string[];
+    };
+    
+    const url = linkPreview.url || href;
+    const title = linkPreview.title || '';
+    const description = linkPreview.description || '';
+    const faviconUrl = linkPreview.favicons?.[0] || '';
+    const imageUrl = linkPreview.images?.[0] || '';
+    
+    const escapedUrl = escapeHtmlAttribute(url);
+    const escapedTitle = title ? escapeHtmlAttribute(title) : '';
+    const escapedDescription = description ? escapeHtmlContent(description) : '';
+    const escapedFaviconUrl = faviconUrl ? escapeHtmlAttribute(faviconUrl) : '';
+    const escapedImageUrl = imageUrl ? escapeHtmlAttribute(imageUrl) : '';
+    
+    return `
+      <a
+        href="${escapedUrl}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="not-prose my-4 flex w-full overflow-hidden rounded-md border border-slate-200 bg-white no-underline transition hover:border-slate-300 hover:shadow-sm hover:no-underline"
+      >
+        <div class="flex min-w-0 flex-1 flex-col justify-center p-3">
+          ${title ? `<div class="text-sm font-medium leading-snug text-slate-900">${escapedTitle}</div>` : ''}
+          ${description ? `<div class="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-500">${escapedDescription}</div>` : ''}
+          <div class="mt-1.5 flex items-center gap-1.5 text-xs text-slate-400">
+            ${faviconUrl ? `<img src="${escapedFaviconUrl}" alt="" class="h-3.5 w-3.5 shrink-0" loading="lazy" />` : ''}
+            <span class="truncate">${escapedUrl}</span>
+          </div>
+        </div>
+        ${imageUrl ? `<div class="hidden h-24 w-40 shrink-0 sm:block"><img src="${escapedImageUrl}" alt="" class="h-full w-full object-cover" loading="lazy" /></div>` : ''}
+      </a>
+    `;
+  } catch {
+    // フォールバック: シンプルなリンク
+    return `<a href="${escapeHtmlAttribute(href)}" target="_blank" rel="noopener noreferrer">${escapeHtmlContent(href)}</a>`;
+  }
+}
 
-  switch (type) {
+/**
+ * リンクHTMLを生成（text + href用）
+ */
+function renderLink(href: string, label: string): string {
+  return `<a href="${escapeHtmlAttribute(href)}" target="_blank" rel="noopener noreferrer">${escapeHtmlContent(label)}</a>`;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function convertBlockToHtml(block: any, getHeadingId: () => number): Promise<string> {
+  switch (block.type) {
     case 'paragraph': {
-      const text = block.paragraph?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
-      return `<p>${escapeHtmlContent(text)}</p>`;
+      const richText = block.paragraph?.rich_text || [];
+      if (richText.length === 0) return '';
+      // 各要素を HTML に変換して結合
+      const htmlParts = await Promise.all(richText.map(async (item: { type: string; href?: string | null; plain_text?: string }) => {
+        const { type, href, plain_text } = item;
+        
+        // mention → ブックマークカード
+        if (type === 'mention' && href) {
+          return await renderBookmarkCard(href);
+        }
+        
+        // text + href あり → リンク
+        if (type === 'text' && href) {
+          return renderLink(href, plain_text || href);
+        }
+        
+        // text + href なし → 通常テキスト
+        return escapeHtmlContent(plain_text || '');
+      }));
+      
+      // text のみの場合は <p> タグで囲む、mention（ブックマーク）が含まれる場合はそのまま結合
+      const hasMention = richText.some((item: { type: string }) => item.type === 'mention');
+      if (hasMention) {
+        return htmlParts.join('');
+      }
+      return `<p>${htmlParts.join('')}</p>`;
     }
     case 'heading_1': {
       const text = block.heading_1?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
@@ -104,6 +183,10 @@ function convertBlockToHtml(block: any, getHeadingId: () => number): string {
     case 'quote': {
       const text = block.quote?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
       return `<blockquote>${escapeHtmlContent(text)}</blockquote>`;
+    }
+    case 'bookmark': {
+      const url = block.bookmark?.url || '';
+      return renderBookmarkCard(url);
     }
     case 'image': {
       const imageData = block.image;
@@ -265,12 +348,14 @@ export class NotionBlogProvider implements DetailableBlogProvider {
       });
 
       let headingCounter = 0;
-      const content = blocks.results.map((block) => {
-        return convertBlockToHtml(block, () => {
+      const content: string[] = [];
+      for (const block of blocks.results) {
+        const html = await convertBlockToHtml(block, () => {
           headingCounter++;
           return headingCounter;
         });
-      }).join('\n');
+        content.push(html);
+      }
 
       return {
         id: page.id,
@@ -278,7 +363,7 @@ export class NotionBlogProvider implements DetailableBlogProvider {
         createdTime: formattedCreatedTime,
         lastEditedTime: formattedLastEditedTime,
         tags,
-        content,
+        content: content.join('\n'),
       };
     } catch (error) {
       console.error(`Failed to get blog post by slug ${slug}:`, error);
