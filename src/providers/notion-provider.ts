@@ -64,6 +64,20 @@ function escapeHtmlContent(str: string): string {
 }
 
 /**
+ * Notion colorをインラインスタイルに変換
+ */
+function getCalloutStyle(color: string): string {
+  const parts = color.split('_');
+  if (parts.length === 2 && parts[1] === 'background') {
+    return `background-color: ${parts[0]}; color: white;`;
+  }
+  if (parts.length === 1 && parts[0] !== 'default') {
+    return `color: ${parts[0]};`;
+  }
+  return '';
+}
+
+/**
  * ブックマークカードHTMLを生成（mentionタイプ用）
  */
 async function renderBookmarkCard(href: string): Promise<string> {
@@ -211,6 +225,30 @@ async function convertBlockToHtml(block: any, getHeadingId: () => number): Promi
       const escapedCaption = escapeHtmlContent(caption);
 
       return `<figure class="my-4"><img src="${escapedUrl}" alt="${escapedAlt}" class="w-full rounded-lg" />${caption ? `<figcaption class="text-sm text-muted-foreground mt-2 text-center">${escapedCaption}</figcaption>` : ''}</figure>`;
+    }
+    case 'callout': {
+      const calloutData = block.callout;
+      const text = calloutData?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
+      const color = calloutData?.color || 'default';
+      const icon = calloutData?.icon;
+      
+      // アイコンの処理
+      let iconHtml = '';
+      if (icon?.type === 'emoji') {
+        iconHtml = `<span class="notion-callout-icon">${icon.emoji}</span>`;
+      } else if (icon?.type === 'external') {
+        const iconUrl = escapeHtmlAttribute(icon.external?.url || '');
+        iconHtml = `<img src="${iconUrl}" alt="" class="notion-callout-icon-img" />`;
+      } else if (icon?.type === 'file') {
+        const iconUrl = escapeHtmlAttribute(icon.file?.url || '');
+        iconHtml = `<img src="${iconUrl}" alt="" class="notion-callout-icon-img" />`;
+      }
+      
+      const style = getCalloutStyle(color);
+      const styleAttr = style ? ` style="${style}"` : '';
+      const escapedText = escapeHtmlContent(text);
+      
+      return `<div class="notion-callout bg-gradient-to-br from-white-500/50 to-white-500/10 shadow-sm"${styleAttr}>${iconHtml}<span class="notion-callout-text">${escapedText}</span></div>`;
     }
     default:
       return '';

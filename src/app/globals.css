@@ -154,3 +154,20 @@
 .code-block-wrapper .shiki code {
   @apply !bg-transparent;
 }
+
+/* Notion Callout styles */
+.notion-callout {
+  @apply flex items-start gap-3 p-4 my-4 rounded-lg;
+}
+
+.notion-callout-icon {
+  @apply text-xl leading-none shrink-0;
+}
+
+.notion-callout-icon-img {
+  @apply w-5 h-5 shrink-0 object-contain;
+}
+
+.notion-callout-text {
+  @apply flex-1 leading-relaxed;
+}
