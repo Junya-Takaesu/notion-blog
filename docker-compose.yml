@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: development
+      # network: host # Enable this if timeout error related to inconsintent MTU settings occures.
     container_name: notion-blog-dev
     ports:
       - "41234:3000"
