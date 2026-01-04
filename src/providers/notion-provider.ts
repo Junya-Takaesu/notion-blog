@@ -271,6 +271,12 @@ async function getAllNotionPosts(): Promise<BlogPost[]> {
 
   const response = await client.dataSources.query({
     data_source_id: dsId,
+    filter: {
+      property: 'Published',
+      checkbox: {
+        equals: true,
+      },
+    },
   });
 
   const blogPosts: BlogPost[] = response.results.map((page: NotionPage) => {

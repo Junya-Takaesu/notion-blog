@@ -115,7 +115,17 @@ interface NotionTag {
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
     try {
-        const response = await queryDatasource();
+        const client = getNotionClient();
+        const dsId = getDatasourceId();
+        const response = await client.dataSources.query({
+            data_source_id: dsId,
+            filter: {
+                property: 'Published',
+                checkbox: {
+                    equals: true,
+                },
+            },
+        });
 
         // Extract blog posts from the response
         const blogPosts: BlogPost[] = response.results.map((page: NotionPage) => {
