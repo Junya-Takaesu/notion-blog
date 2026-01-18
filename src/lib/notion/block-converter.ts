@@ -5,6 +5,10 @@ import { wrapListItems } from "./list-wrapper";
 
 /**
  * ブロックとその子ブロックを再帰的にHTMLに変換
+ *
+ * @param block Notion のブロックオブジェクト
+ * @param getHeadingId 見出し用の一意な ID を採番するための関数
+ * @param depth 現在のネストの深さ。再帰呼び出し時に増加させており、将来の拡張（例：インデントや最大ネスト深度の制御）のために保持されていますが、現時点では描画処理には使用されません。
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function convertBlockToHtml(block: any, getHeadingId: () => number, depth: number = 0): Promise<string> {
