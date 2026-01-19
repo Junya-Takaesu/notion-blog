@@ -2,13 +2,23 @@ import { ImageResponse } from 'next/og'
 import { getBlogPostBySlug } from '@/actions/blog'
 import { SITE_CONFIG } from '@/lib/utils'
 
-export const runtime = 'edge'
 export const alt = 'ブログ記事のOG画像'
 export const size = {
   width: 1200,
   height: 630,
 }
 export const contentType = 'image/png'
+
+export async function generateStaticParams() {
+  const { getBlogPosts } = await import('@/actions/blog')
+  const posts = await getBlogPosts()
+
+  return posts
+    .filter(post => !post.isExternal)  // Notion記事のみ
+    .map((post) => ({
+      slug: post.href.replace('/posts/', ''),
+    }))
+}
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params

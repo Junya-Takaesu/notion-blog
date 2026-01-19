@@ -9,11 +9,25 @@ import {
   BlogNavigationSkeleton,
   BlogSidebarSkeleton,
 } from "@/components/blog/skeletons"
-import { getBlogPostBySlug } from "@/actions/blog"
+import { getBlogPostBySlug, getBlogPosts } from "@/actions/blog"
 import { generateDescription, generateArticleMetadata } from "@/lib/utils"
 
 // Enable ISR with 10-minute revalidation
 export const revalidate = 600
+
+// 静的パスの生成（Notion記事のみ）
+export async function generateStaticParams() {
+  const posts = await getBlogPosts()
+
+  return posts
+    .filter(post => !post.isExternal)  // Notion記事のみ
+    .map((post) => ({
+      slug: post.href.replace('/posts/', ''),
+    }))
+}
+
+// 新規記事もオンデマンド生成
+export const dynamicParams = true
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
