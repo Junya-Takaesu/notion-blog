@@ -1,5 +1,6 @@
 'use server';
 
+import { cache } from 'react';
 import { BlogPost, FetchResult, TagWithCount, BlogPostDetail } from "@/lib/types/blog";
 import {
   fetchPostsFromMonth,
@@ -28,9 +29,9 @@ export async function getMorePosts(lastYearMonth: string): Promise<FetchResult> 
 /**
  * 全記事を取得
  */
-export async function getBlogPosts(): Promise<BlogPost[]> {
+export const getBlogPosts = cache(async (): Promise<BlogPost[]> => {
   return getAllPosts();
-}
+});
 
 /**
  * 全タグとその記事数を取得
@@ -42,6 +43,6 @@ export async function getBlogTags(): Promise<TagWithCount[]> {
 /**
  * スラッグから記事詳細を取得（Notion のみ）
  */
-export async function getBlogPostBySlug(slug: string): Promise<BlogPostDetail | null> {
+export const getBlogPostBySlug = cache(async (slug: string): Promise<BlogPostDetail | null> => {
   return notionProvider.getPostBySlug(slug);
-}
+});

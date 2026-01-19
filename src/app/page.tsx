@@ -9,8 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
 import Link from "next/link"
 
-// Force dynamic rendering for this page
-export const dynamic = 'force-dynamic'
+// Enable ISR with 10-minute revalidation
+export const revalidate = 600
 
 export const metadata: Metadata = {
   title: "記事一覧",
