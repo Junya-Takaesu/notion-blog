@@ -12,8 +12,8 @@ import {
 import { getBlogPostBySlug } from "@/actions/blog"
 import { generateDescription, generateArticleMetadata } from "@/lib/utils"
 
-// Force dynamic rendering for this page
-export const dynamic = 'force-dynamic'
+// Enable ISR with 10-minute revalidation
+export const revalidate = 600
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
