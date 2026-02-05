@@ -142,6 +142,40 @@ export async function convertBlockToHtml(block: any, getHeadingId: () => number,
 
       return `<div class="notion-callout bg-gradient-to-br from-white-500/50 to-white-500/10 shadow-sm"${styleAttr}>${iconHtml}<span class="notion-callout-text">${escapedText}</span></div>${childrenHtml}`;
     }
+    case 'table': {
+      // テーブルの子ブロック（table_row）を取得して行を構築
+      const tableData = block.table;
+      const hasColumnHeader = tableData?.has_column_header || false;
+      const hasRowHeader = tableData?.has_row_header || false;
+      const childBlocks = block.has_children ? await getAllBlocks(block.id) : [];
+
+      let rowsHtml = '';
+      childBlocks.forEach((childBlock: { type: string; table_row?: { cells?: Array<Array<{ plain_text?: string }>> } }, rowIndex: number) => {
+        if (childBlock.type === 'table_row') {
+          const cells = childBlock.table_row?.cells || [];
+          const isHeaderRow = hasColumnHeader && rowIndex === 0;
+
+          const cellsHtml = cells.map((cell: Array<{ plain_text?: string }>, cellIndex: number) => {
+            const cellText = cell.map((t: { plain_text?: string }) => t.plain_text || '').join('');
+            const escapedText = escapeHtmlContent(cellText);
+            const isRowHeaderCell = hasRowHeader && cellIndex === 0;
+
+            if (isHeaderRow || isRowHeaderCell) {
+              return `<th class="border border-slate-300 px-3 py-2 text-left font-semibold bg-slate-50">${escapedText}</th>`;
+            }
+            return `<td class="border border-slate-300 px-6 py-2">${escapedText}</td>`;
+          }).join('');
+
+          rowsHtml += `<tr>${cellsHtml}</tr>`;
+        }
+      });
+
+      return `<div class="overflow-x-auto my-4"><table class="w-full border-collapse border border-slate-300"><tbody>${rowsHtml}</tbody></table></div>`;
+    }
+    case 'table_row': {
+      // table_row は table 内で処理されるため、単独では空を返す
+      return '';
+    }
     default:
       return childrenHtml;
   }
