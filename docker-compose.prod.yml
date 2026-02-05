@@ -13,10 +13,9 @@ services:
     env_file:
       - .env.local
     restart: always
-    read_only: true
+    # read_only: true # ← ISR breaks if this is enabled
     tmpfs:
       - /tmp
-      - /app/.next/cache
     security_opt:
       - no-new-privileges:true
     cap_drop:
