@@ -11,6 +11,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { BlogSidebarContent } from "./blog-sidebar-content"
+import { ThemeToggle } from "@/components/blog/ThemeToggle"
 
 interface Tag {
   name: string
@@ -44,12 +45,18 @@ export function MobileMenu({ tocItems, tags, selectedTags = [] }: MobileMenuProp
           <span className="sr-only">メニューを開く</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto">
+      <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto flex flex-col">
         <SheetHeader>
           <SheetTitle>メニュー</SheetTitle>
         </SheetHeader>
-        <div className="mt-6">
+        <div className="mt-6 flex-1 overflow-y-auto">
           <BlogSidebarContent tocItems={tocItems} tags={tags} selectedTags={selectedTags} onLinkClick={() => setOpen(false)} />
+        </div>
+        <div className="py-4 border-t border-border mt-auto">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">テーマ</span>
+            <ThemeToggle />
+          </div>
         </div>
       </SheetContent>
     </Sheet>
