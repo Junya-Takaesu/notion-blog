@@ -161,16 +161,16 @@ export async function convertBlockToHtml(block: any, getHeadingId: () => number,
             const isRowHeaderCell = hasRowHeader && cellIndex === 0;
 
             if (isHeaderRow || isRowHeaderCell) {
-              return `<th class="border border-slate-300 px-3 py-2 text-left font-semibold bg-slate-50">${escapedText}</th>`;
+              return `<th class="border border-border px-3 py-2 text-left font-semibold bg-muted dark:text-foreground">${escapedText}</th>`;
             }
-            return `<td class="border border-slate-300 px-6 py-2">${escapedText}</td>`;
+            return `<td class="border border-border px-6 py-2">${escapedText}</td>`;
           }).join('');
 
           rowsHtml += `<tr>${cellsHtml}</tr>`;
         }
       });
 
-      return `<div class="overflow-x-auto my-4"><table class="w-full border-collapse border border-slate-300"><tbody>${rowsHtml}</tbody></table></div>`;
+      return `<div class="overflow-x-auto my-4"><table class="w-full border-collapse border border-border"><tbody>${rowsHtml}</tbody></table></div>`;
     }
     case 'table_row': {
       // table_row は table 内で処理されるため、単独では空を返す
