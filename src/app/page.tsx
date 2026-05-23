@@ -74,7 +74,7 @@ export default async function BlogListPage({ searchParams }: BlogListPageProps) 
             </Suspense>
           </main>
 
-          <aside className="w-full lg:w-80 lg:flex-shrink-0 hidden lg:block">
+          <aside className="w-full lg:w-80 lg:flex-shrink-0 hidden lg:block lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
             <Suspense fallback={<BlogSidebarSkeleton />}>
               <SidebarData selectedTags={selectedTags} />
             </Suspense>
