@@ -125,6 +125,10 @@
   }
 }
 
+.blog-content :not(pre) > code {
+  @apply rounded bg-muted px-1 py-0.5 text-xs text-destructive sm:text-sm;
+}
+
 /* Syntax highlighting code block styles */
 .code-block-wrapper {
   @apply my-6 rounded-lg overflow-hidden border border-border;

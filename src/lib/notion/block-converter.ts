@@ -1,7 +1,45 @@
 import { escapeHtmlAttribute, escapeHtmlContent } from "../html-escape";
 import { getAllBlocks } from "./block-fetcher";
-import { getCalloutStyle, renderBookmarkCard, renderLink } from "./html-renderers";
+import { getCalloutStyle, renderBookmarkCard } from "./html-renderers";
 import { wrapListItems } from "./list-wrapper";
+
+type RichTextItem = {
+  type: string;
+  href?: string | null;
+  plain_text?: string;
+  annotations?: {
+    bold?: boolean;
+    italic?: boolean;
+    strikethrough?: boolean;
+    underline?: boolean;
+    code?: boolean;
+  };
+};
+
+function getPlainText(richText: Array<{ plain_text?: string }> = []): string {
+  return richText.map((text) => text.plain_text || '').join('');
+}
+
+function renderRichTextItem(item: RichTextItem): string {
+  let html = escapeHtmlContent(item.plain_text || '');
+  const annotations = item.annotations;
+
+  if (annotations?.code) html = `<code>${html}</code>`;
+  if (annotations?.bold) html = `<strong>${html}</strong>`;
+  if (annotations?.italic) html = `<em>${html}</em>`;
+  if (annotations?.strikethrough) html = `<s>${html}</s>`;
+  if (annotations?.underline) html = `<u>${html}</u>`;
+
+  if (item.type === 'text' && item.href) {
+    return `<a href="${escapeHtmlAttribute(item.href)}" target="_blank" rel="noopener noreferrer">${html}</a>`;
+  }
+
+  return html;
+}
+
+function renderRichText(richText: RichTextItem[] = []): string {
+  return richText.map(renderRichTextItem).join('');
+}
 
 /**
  * ブロックとその子ブロックを再帰的にHTMLに変換
@@ -30,21 +68,13 @@ export async function convertBlockToHtml(block: any, getHeadingId: () => number,
       const richText = block.paragraph?.rich_text || [];
       if (richText.length === 0) return childrenHtml || '';
       // 各要素を HTML に変換して結合
-      const htmlParts = await Promise.all(richText.map(async (item: { type: string; href?: string | null; plain_text?: string }) => {
-        const { type, href, plain_text } = item;
-
+      const htmlParts = await Promise.all(richText.map(async (item: RichTextItem) => {
         // mention → ブックマークカード
-        if (type === 'mention' && href) {
-          return await renderBookmarkCard(href);
+        if (item.type === 'mention' && item.href) {
+          return await renderBookmarkCard(item.href);
         }
 
-        // text + href あり → リンク
-        if (type === 'text' && href) {
-          return renderLink(href, plain_text || href);
-        }
-
-        // text + href なし → 通常テキスト
-        return escapeHtmlContent(plain_text || '');
+        return renderRichTextItem(item);
       }));
 
       // text のみの場合は <p> タグで囲む、mention（ブックマーク）が含まれる場合はそのまま結合
@@ -55,40 +85,40 @@ export async function convertBlockToHtml(block: any, getHeadingId: () => number,
       return `<p>${htmlParts.join('')}</p>${childrenHtml}`;
     }
     case 'heading_1': {
-      const text = block.heading_1?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
+      const richText = block.heading_1?.rich_text || [];
       const id = `heading-${getHeadingId()}`;
-      return `<h1 id="${id}">${escapeHtmlContent(text)}</h1>${childrenHtml}`;
+      return `<h1 id="${id}">${renderRichText(richText)}</h1>${childrenHtml}`;
     }
     case 'heading_2': {
-      const text = block.heading_2?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
+      const richText = block.heading_2?.rich_text || [];
       const id = `heading-${getHeadingId()}`;
-      return `<h2 id="${id}">${escapeHtmlContent(text)}</h2>${childrenHtml}`;
+      return `<h2 id="${id}">${renderRichText(richText)}</h2>${childrenHtml}`;
     }
     case 'heading_3': {
-      const text = block.heading_3?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
+      const richText = block.heading_3?.rich_text || [];
       const id = `heading-${getHeadingId()}`;
-      return `<h3 id="${id}">${escapeHtmlContent(text)}</h3>${childrenHtml}`;
+      return `<h3 id="${id}">${renderRichText(richText)}</h3>${childrenHtml}`;
     }
     case 'bulleted_list_item': {
-      const text = block.bulleted_list_item?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
+      const richText = block.bulleted_list_item?.rich_text || [];
       // 子要素がある場合はネストしたリストを含める
-      return `<li data-list-type="bulleted">${escapeHtmlContent(text)}${childrenHtml}</li>`;
+      return `<li data-list-type="bulleted">${renderRichText(richText)}${childrenHtml}</li>`;
     }
     case 'numbered_list_item': {
-      const text = block.numbered_list_item?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
+      const richText = block.numbered_list_item?.rich_text || [];
       // 子要素がある場合はネストしたリストを含める
-      return `<li data-list-type="numbered">${escapeHtmlContent(text)}${childrenHtml}</li>`;
+      return `<li data-list-type="numbered">${renderRichText(richText)}${childrenHtml}</li>`;
     }
     case 'code': {
-      const text = block.code?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
+      const text = getPlainText(block.code?.rich_text);
       const language = block.code?.language || 'plain text';
       const escapedText = escapeHtmlContent(text);
       const escapedLanguage = escapeHtmlAttribute(language);
       return `<pre data-language="${escapedLanguage}"><code>${escapedText}</code></pre>`;
     }
     case 'quote': {
-      const text = block.quote?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
-      return `<blockquote>${escapeHtmlContent(text)}${childrenHtml}</blockquote>`;
+      const richText = block.quote?.rich_text || [];
+      return `<blockquote>${renderRichText(richText)}${childrenHtml}</blockquote>`;
     }
     case 'bookmark': {
       const url = block.bookmark?.url || '';
@@ -120,7 +150,7 @@ export async function convertBlockToHtml(block: any, getHeadingId: () => number,
     }
     case 'callout': {
       const calloutData = block.callout;
-      const text = calloutData?.rich_text?.map((t: { plain_text?: string }) => t.plain_text).join('') || '';
+      const richText = calloutData?.rich_text || [];
       const color = calloutData?.color || 'default';
       const icon = calloutData?.icon;
 
@@ -138,9 +168,8 @@ export async function convertBlockToHtml(block: any, getHeadingId: () => number,
 
       const style = getCalloutStyle(color);
       const styleAttr = style ? ` style="${style}"` : '';
-      const escapedText = escapeHtmlContent(text);
 
-      return `<div class="notion-callout bg-gradient-to-br from-white-500/50 to-white-500/10 shadow-sm"${styleAttr}>${iconHtml}<span class="notion-callout-text">${escapedText}</span></div>${childrenHtml}`;
+      return `<div class="notion-callout bg-gradient-to-br from-white-500/50 to-white-500/10 shadow-sm"${styleAttr}>${iconHtml}<span class="notion-callout-text">${renderRichText(richText)}</span></div>${childrenHtml}`;
     }
     case 'table': {
       // テーブルの子ブロック（table_row）を取得して行を構築
@@ -150,20 +179,19 @@ export async function convertBlockToHtml(block: any, getHeadingId: () => number,
       const childBlocks = block.has_children ? await getAllBlocks(block.id) : [];
 
       let rowsHtml = '';
-      childBlocks.forEach((childBlock: { type: string; table_row?: { cells?: Array<Array<{ plain_text?: string }>> } }, rowIndex: number) => {
+      childBlocks.forEach((childBlock: { type: string; table_row?: { cells?: RichTextItem[][] } }, rowIndex: number) => {
         if (childBlock.type === 'table_row') {
           const cells = childBlock.table_row?.cells || [];
           const isHeaderRow = hasColumnHeader && rowIndex === 0;
 
-          const cellsHtml = cells.map((cell: Array<{ plain_text?: string }>, cellIndex: number) => {
-            const cellText = cell.map((t: { plain_text?: string }) => t.plain_text || '').join('');
-            const escapedText = escapeHtmlContent(cellText);
+          const cellsHtml = cells.map((cell: RichTextItem[], cellIndex: number) => {
+            const cellHtml = renderRichText(cell);
             const isRowHeaderCell = hasRowHeader && cellIndex === 0;
 
             if (isHeaderRow || isRowHeaderCell) {
-              return `<th class="border border-border px-3 py-2 text-left font-semibold bg-muted dark:text-foreground">${escapedText}</th>`;
+              return `<th class="border border-border px-3 py-2 text-left font-semibold bg-muted dark:text-foreground">${cellHtml}</th>`;
             }
-            return `<td class="border border-border px-6 py-2">${escapedText}</td>`;
+            return `<td class="border border-border px-6 py-2">${cellHtml}</td>`;
           }).join('');
 
           rowsHtml += `<tr>${cellsHtml}</tr>`;

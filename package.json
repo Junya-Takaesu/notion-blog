@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "node scripts/block-converter-inline-code.test.mjs",
     "lint": "eslint"
   },
   "dependencies": {
