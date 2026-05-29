@@ -43,6 +43,6 @@ next-env.d.ts
 
 # Claude Code and development tools
 .claude/settings.local.json
+.claude/skills/notion-blog-deploy/
 .serena
 .playwright-mcp
-
