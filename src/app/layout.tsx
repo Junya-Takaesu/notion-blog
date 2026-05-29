@@ -29,7 +29,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <header className="border-b">
+          <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
             <div className="container mx-auto px-4 py-4 flex justify-between items-center">
               <Link href="/" className="text-2xl font-bold hover:text-gray-600 transition-colors">
                 {SITE_CONFIG.name}
