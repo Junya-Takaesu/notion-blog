@@ -1,7 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { SITE_CONFIG } from '@/lib/utils'
 
-export const runtime = 'edge'
 export const alt = SITE_CONFIG.name
 export const size = {
   width: 1200,
